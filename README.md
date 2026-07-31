@@ -1,14 +1,14 @@
-# 🏐 Handball AI — Real-Time Tactical Analysis
+# Handball AI — Real-Time Tactical Analysis
 
 > Pipeline متكامل لتحليل ماتشات كرة اليد من فيديو broadcast: تتبع اللاعبين والكرة، كشف الأحداث (Pass / Shot / Goal / Save / Fast Break)، توليد تقارير تكتيكية على طريقة Once Sport / Scoutz / Data Video 2007.
 
-> 🔒 **Portfolio showcase — proprietary.** This repository presents the *idea and engineering* of the system for demonstration only. See **[LICENSE](LICENSE)**: all rights reserved — no use, copying, or redistribution.
+> **Portfolio showcase — proprietary.** This repository presents the *idea and engineering* of the system for demonstration only. See **[LICENSE](LICENSE)**: all rights reserved — no use, copying, or redistribution.
 
-### ⚙️ How it works
+### How it works
 
 ```mermaid
 flowchart LR
-    A["🎥 4K RTSP camera"] --> B["Frame capture<br/>OpenCV + CUDA"]
+    A["4K RTSP camera"] --> B["Frame capture<br/>OpenCV + CUDA"]
     B --> C["YOLOv8<br/>player + ball detection"]
     C --> D["Tracking + Re-ID<br/>OSNet, multi-session"]
     D --> E["Team classification<br/>HSV · red vs blue"]
@@ -18,34 +18,34 @@ flowchart LR
     G --> H["Analytics<br/>stats · zones · pass network"]
     G --> I["Per-goal tactical replay<br/>arrows + mini-court"]
     H --> J["Live dashboard<br/>FastAPI + WebSocket"]
-    J --> K["📱 Phone / ⌚ Watch<br/>live stats over local hotspot"]
+    J --> K["Phone / Watch<br/>live stats over local hotspot"]
 ```
 
-### ✨ Highlights
-- 🎥 **100% offline**, real-time analysis from a 4K RTSP camera (CUDA / RTX).
-- 🤖 **YOLOv8** player + ball detection with multi-session **re-identification** (OSNet).
-- 🎽 Automatic **team classification** (HSV) and **court homography** for a true top-down view.
-- 🧠 **Event engine** — passes, shots, goals, saves, fast-breaks — with per-goal **tactical replays** (arrows + mini-court).
-- 📊 Live **dashboard** (FastAPI + WebSocket) streaming stats to a phone / smartwatch over a local hotspot.
+### Highlights
+- **100% offline**, real-time analysis from a 4K RTSP camera (CUDA / RTX).
+- **YOLOv8** player + ball detection with multi-session **re-identification** (OSNet).
+- Automatic **team classification** (HSV) and **court homography** for a true top-down view.
+- **Event engine** — passes, shots, goals, saves, fast-breaks — with per-goal **tactical replays** (arrows + mini-court).
+- Live **dashboard** (FastAPI + WebSocket) streaming stats to a phone / smartwatch over a local hotspot.
 
 ---
 
-## 📑 جدول المحتويات
-1. [نظرة عامة](#-نظرة-عامة)
-2. [الـ Pipeline](#-الـ-pipeline)
-3. [البنية والملفات](#-البنية-والملفات)
-4. [التثبيت والتشغيل](#-التثبيت-والتشغيل)
-5. [الـ CLI Flags](#-الـ-cli-flags)
-6. [الموديولات بالتفصيل](#-الموديولات-بالتفصيل)
-7. [Training: الموديل المُدرَّب على كرة اليد](#-training-الموديل-المُدرَّب-على-كرة-اليد)
-8. [مخرجات النظام](#-مخرجات-النظام)
-9. [رحلة المشاكل والحلول](#-رحلة-المشاكل-والحلول)
-10. [الحالة الحالية](#-الحالة-الحالية)
-11. [Future Work](#-future-work)
+## جدول المحتويات
+1. [نظرة عامة](#نظرة-عامة)
+2. [الـ Pipeline](#الـ-pipeline)
+3. [البنية والملفات](#البنية-والملفات)
+4. [التثبيت والتشغيل](#التثبيت-والتشغيل)
+5. [الـ CLI Flags](#الـ-cli-flags)
+6. [الموديولات بالتفصيل](#الموديولات-بالتفصيل)
+7. [Training: الموديل المُدرَّب على كرة اليد](#training-الموديل-المُدرَّب-على-كرة-اليد)
+8. [مخرجات النظام](#مخرجات-النظام)
+9. [رحلة المشاكل والحلول](#رحلة-المشاكل-والحلول)
+10. [الحالة الحالية](#الحالة-الحالية)
+11. [Future Work](#future-work)
 
 ---
 
-## 🎯 نظرة عامة
+## نظرة عامة
 
 ### الهدف
 بناء نظام بمستوى احترافي (Once Sport / Hawk-Eye / Scoutz) يحلل ماتشات كرة اليد من فيديو broadcast ويُخرج:
@@ -69,7 +69,7 @@ flowchart LR
 
 ---
 
-## 🔁 الـ Pipeline
+## الـ Pipeline
 
 ```
    ┌──────────────────┐
@@ -119,21 +119,21 @@ flowchart LR
 
 ---
 
-## 📂 البنية والملفات
+## البنية والملفات
 
 ```
 Handball project/
 ├── src/                            # كل الـ source code
-│   ├── pipeline.py                 # ★ الـ entry point الأساسي
+│   ├── pipeline.py                 # الـ entry point الأساسي
 │   ├── capture.py                  # RTSP/file capture في thread منفصل
 │   ├── detector.py                 # YOLOv8 dual-engine (pose + ball)
 │   ├── tracker.py                  # BoT-SORT + Kalman ball + phantom logic
-│   ├── ball_kalman.py              # ★ Kalman Filter للكرة (gating + smoothing)
+│   ├── ball_kalman.py              # Kalman Filter للكرة (gating + smoothing)
 │   ├── player_reid.py              # دمج الـ IDs المفقودة عبر occlusions
 │   ├── multi_session_reid.py       # gallery دائم بالـ HSV fingerprints
 │   ├── jersey_ocr.py               # EasyOCR على أرقام القمصان (background thread)
-│   ├── handball_rules.py           # ★ Rules engine — Possession/Pass/Shot/Goal/...
-│   ├── goal_replay.py              # ★ tactical freeze + MP4 + 2D mini-court
+│   ├── handball_rules.py           # Rules engine — Possession/Pass/Shot/Goal/...
+│   ├── goal_replay.py              # tactical freeze + MP4 + 2D mini-court
 │   ├── goal_post_detector.py       # Dynamic goal-frame detection (geometric)
 │   ├── court_mask.py               # Color-agnostic court region mask (opt-in)
 │   ├── court_detector.py           # IHF court keypoints + homography
@@ -152,7 +152,7 @@ Handball project/
 │   └── ...
 │
 ├── training/                       # Custom-trained ball model pipeline
-│   ├── auto_label.py               # ★ generate labels من فيديوهاتك تلقائياً
+│   ├── auto_label.py               # generate labels من فيديوهاتك تلقائياً
 │   ├── annotate_ball.py            # Manual annotation (click-based)
 │   ├── train_ball.py               # Fine-tune yolov8n على الـ dataset
 │   ├── dataset/                    # Generated train/val data
@@ -160,7 +160,7 @@ Handball project/
 │   │   └── labels/{train,val}/
 │   └── runs/ball_v2/weights/best.pt → handball_ball.pt (root)
 │
-├── handball_ball.pt                # ★ الـ fine-tuned ball model (auto-loaded)
+├── handball_ball.pt                # الـ fine-tuned ball model (auto-loaded)
 ├── yolov8s-pose.pt                 # COCO pose model (players)
 ├── yolov8n.pt                      # COCO nano (fallback ball)
 │
@@ -191,7 +191,7 @@ Handball project/
 
 ---
 
-## 🚀 التثبيت والتشغيل
+## التثبيت والتشغيل
 
 ### المتطلبات
 - Windows 10/11 + Python 3.12
@@ -205,7 +205,7 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install easyocr        # للـ jersey OCR
 ```
 
-> ⚠️ **مهم**: `easyocr` بيجيب `opencv-python-headless` كـ dep ودي بتلغي الـ GUI.
+> **مهم**: `easyocr` بيجيب `opencv-python-headless` كـ dep ودي بتلغي الـ GUI.
 > لو حصلت مشكلة `cv2.namedWindow not implemented`:
 > ```cmd
 > .venv\Scripts\python.exe -m pip uninstall opencv-python-headless -y
@@ -255,7 +255,7 @@ run_live.bat
 
 ---
 
-## 🎛️ الـ CLI Flags
+## الـ CLI Flags
 
 ```cmd
 src\pipeline.py [OPTIONS]
@@ -281,9 +281,9 @@ src\pipeline.py [OPTIONS]
 
 ---
 
-## 🧩 الموديولات بالتفصيل
+## الموديولات بالتفصيل
 
-### `pipeline.py` ★
+### `pipeline.py`
 الـ entry point. بيدير الـ flow كامل:
 1. Capture frame → 2. Detect → 3. Track → 4. ReID → 5. OCR → 6. Rules → 7. Display + Replay
 
@@ -294,7 +294,7 @@ Dual-engine YOLO:
 - Geometric filters: `area=[20, 9000]`, `aspect_max=4.0`
 - لما الموديل المُدرَّب يُحمَّل، الـ ball_conf يُرفَع تلقائياً لـ 0.20 (لأن الموديل واثق على الكرات الحقيقية)
 
-### `tracker.py` ★
+### `tracker.py`
 الأهم في النظام. بيشتغل على 4 طبقات:
 
 **1. Player tracking (BoT-SORT)**
@@ -319,7 +319,7 @@ Dual-engine YOLO:
 - البلاك ليست بتفضل 60 ثانية → الملصقة على الأرض ما تعدش
 - بترسم دوائر حمرا "MARKER" في debug overlay
 
-**5. Kalman ball filter** ★
+**5. Kalman ball filter**
 موديول جديد ([ball_kalman.py](src/ball_kalman.py)):
 - 6-state vector: position + velocity + acceleration
 - Constant-acceleration physics
@@ -327,7 +327,7 @@ Dual-engine YOLO:
 - Lock بعد 2 detections متسقة
 - Output position = smoothed Kalman state (مش raw YOLO)
 
-### `ball_kalman.py` ★ (الحل الذكي)
+### `ball_kalman.py` (الحل الذكي)
 الفلاتر القديمة كانت تشتغل في frame واحد. الـ Kalman يشتغل في الزمن:
 1. **Predict**: مكان الكرة المتوقع
 2. **Gate**: detections بعيدة عن المسار → reject (يقتل head FPs والملصقات)
@@ -342,7 +342,7 @@ Dual-engine YOLO:
 | `GATE_M` | 3.5 | Mahalanobis gate (99.7% ellipse) |
 | `MAX_MISSED_FRAMES` | 25 | Reset filter بعد كده |
 
-### `handball_rules.py` ★
+### `handball_rules.py`
 Rules engine بـ debounce وcooldowns مدروسين:
 
 | Event | Detection logic |
@@ -354,7 +354,7 @@ Rules engine بـ debounce وcooldowns مدروسين:
 | **FAST_BREAK** | possession changed 0.4-3s ago، speed 14-80 px/f، ≥1 defender visible، cooldown 4s |
 | **Phantom suppression** | لو phantom streak >2، الـ rules engine ميفجرش events |
 
-### `goal_replay.py` ★
+### `goal_replay.py`
 عند كل GOAL event، بيخرج 3 ملفات:
 - **PNG**: freeze + arrows + 2D mini-court inset (Once Sport style)
 - **MP4**: 4s pre + 1.5s post بـ overlays
@@ -427,7 +427,7 @@ PDF reports من ReportLab:
 
 ---
 
-## 🎓 Training: الموديل المُدرَّب على كرة اليد
+## Training: الموديل المُدرَّب على كرة اليد
 
 YOLOv8 COCO اتدرب على white footballs / yellow tennis balls — مش handball. النتيجة: recall ~30% فقط على فيديوهاتك. الحل: fine-tune على عيناتك.
 
@@ -474,7 +474,7 @@ copy training\runs\ball_v2\weights\best.pt handball_ball.pt
 
 ---
 
-## 📤 مخرجات النظام
+## مخرجات النظام
 
 ### Live Display (cv2 window)
 - HUD bar: Score / Period clock / Possession (with 0s timer)
@@ -512,11 +512,11 @@ reports/report_fulltime_<timestamp>.pdf
 
 ---
 
-## 🛠️ رحلة المشاكل والحلول
+## رحلة المشاكل والحلول
 
 كل مشكلة هنا لقيناها في تشغيل حقيقي وإيه اللي حلها. مهم نعرف ليه التصميم الحالي بالشكل ده.
 
-### 1. ❌ Tracking كان بيرجع 0 players
+### 1. Tracking كان بيرجع 0 players
 - **العَرَض**: tracks = [] دايماً، الـ HUD مفيش events
 - **السبب**: ultralytics 8.4 غيّر BoT-SORT API — بقت تستنى object فيه `.conf`/`.cls`/`.xyxy` بدل `np.ndarray`
 - **+ السبب الثاني**: `new_track_thresh = 0.70` كان عالي جداً، لاعبين بعيدين بيجوا بـ conf 0.36-0.6 → كلهم بترفض
@@ -525,12 +525,12 @@ reports/report_fulltime_<timestamp>.pdf
   - `new_track_thresh: 0.70 → 0.20`، `track_high_thresh: 0.25 → 0.15`
   - `fuse_score=True` + كل الـ defaults الناقصة في cfg
 
-### 2. ❌ NameError: tracks في `_resolve_shot`
+### 2. NameError: tracks في `_resolve_shot`
 - **العَرَض**: pipeline يكراش لما حد يصوّب أول مرة
 - **السبب**: `def _resolve_shot(self, ball_track, ...)` كان بيستخدم `tracks` من غير ما تكون argument
 - **الحل**: ضفت `tracks` للـ signature + الـ call sites
 
-### 3. ❌ "GK#1" Clone Army
+### 3. "GK#1" Clone Army
 - **العَرَض**: 4-8 لاعبين كلهم labeled "GK#1" / "B#1"
 - **السبب الجذري**: HSV color histogram بيـcollapse لما الملعب أصفر + الجرسي أصفر (Sweden case). كل اللاعبين بصمتهم اللونية متشابهة → MSR يخصص نفس الـ pid لكلهم
 - **+ السبب الثاني**: BoT-SORT tracker بيخسر IDs مع occlusions، tracks جديدة تتولد، OCR بيقفل نفس الرقم على tracks مختلفة
@@ -539,23 +539,23 @@ reports/report_fulltime_<timestamp>.pdf
   2. **Unique-number constraint** في `jersey_ocr.py`: نفس الرقم مش ممكن يتقفل على track-IDs مختلفة لنفس الفريق
   3. **Bind OCR number to MSR pid**: لما tracker يخسر ID ويرجع، MSR يلاقي اللاعب بالـ fingerprint → يرجع الرقم تلقائياً
 
-### 4. ❌ Players outside court being tracked (crowd, bench, photographers)
+### 4. Players outside court being tracked (crowd, bench, photographers)
 - **العَرَض**: ellipses على الجماهير في المدرجات + الـ bench + المصورين
 - **السبب**: YOLO ما عندوش concept للملعب
 - **الحل**: `court_mask.py` — color-agnostic court region. اللاعبين اللي رجليهم برة الـ mask بترفض. **opt-in via `--court-mask`** عشان مش كل الفيديوهات تحتاجها
 
-### 5. ❌ Pre-match lineup graphic detected as players
+### 5. Pre-match lineup graphic detected as players
 - **العَرَض**: portraits الستاتيكية في الـ lineup screen بياخدوا IDs
 - **السبب**: YOLO يشوف human shapes، مفيش awareness للـ broadcast graphics
 - **الحل**: `is_play_frame()` في court_mask — لو visibility < 6%، nothing tracked
 
-### 6. ❌ Phantom ball flying around the court
+### 6. Phantom ball flying around the court
 - **العَرَض**: Orange "ghost" ball طايرة في مكان عشوائي خارج الملعب
 - **السبب**: Mode-2 phantom logic كان يـextrapolate linearly كل ما الكرة تختفي
 - **الحل**: شيلنا Mode-2 entirely. Mode-1 (hand-anchor عند wrist) بس
 - **ورجعنا للنسخة القديمة المستقرة** بعد ما ضافنا continuity bonuses كانوا بيلصقوا الكرة بمكان غلط
 
-### 7. ❌ Floor sticker / paint detected as ball
+### 7. Floor sticker / paint detected as ball
 - **العَرَض**: yellow ellipse على الـ 6m line painted mark
 - **السبب**: YOLO COCO ما يفرقش بين كرة صفرا ودائرة صفرا على الأرض
 - **الحل** (بطبقات):
@@ -563,7 +563,7 @@ reports/report_fulltime_<timestamp>.pdf
   2. **Stationary-killer في tracker.py** — لو same position ±4px لـ 4 frames → blacklist (radius 22px) لـ 60s
   3. **Auto-label re-trained**: استبعدنا 4 marker spots من الـ training data → الموديل ما اتعلمش إنها كرة
 
-### 8. ❌ Player's head detected as ball
+### 8. Player's head detected as ball
 - **العَرَض**: yellow circle على رأس لاعب، Goal مش بيتعد لما الكرة تدخل الشبك
 - **السبب**: الموديل المُدرَّب نفسه كان متلوّث (auto-labeler صنّف رؤوس ك balls). + Anti-head penalty كان gated على not-in-hand فما يـfire-ش لما wrist قريب
 - **الحل**:
@@ -571,7 +571,7 @@ reports/report_fulltime_<timestamp>.pdf
   2. **Auto-label improvements**: stationary rejection + min movement threshold
   3. **ball_conf auto-bump لـ 0.20** مع الموديل المُدرَّب — يكنس weak FPs
 
-### 9. ❌ Goal not counted even when ball clearly enters net
+### 9. Goal not counted even when ball clearly enters net
 - **العَرَض**: الكرة في الشبك واضحة، الـ score 0-0
 - **السبب**: الـ rule كان `bx >= fw - 30` (آخر 30 px فقط)، والـ goal_box detection بيفشل في كاميرات معينة
 - **الحل** (3 paths متوازية):
@@ -579,7 +579,7 @@ reports/report_fulltime_<timestamp>.pdf
   2. `_check_goal_smart` (ported من النسخة القديمة): static 12% goal region (153px) + middle 50% vertical + speed/shot evidence
   3. `_check_direct_goal`: real ball detected inside dynamic_goal_box ≥4 frames + conf ≥ 0.25
 
-### 10. ❌ Ridiculous stat inflation (Away: 32 shots, 105 fast breaks)
+### 10. Ridiculous stat inflation (Away: 32 shots, 105 fast breaks)
 - **العَرَض**: stats غير معقولة بعد دقيقة لعب
 - **السبب**: phantom ball jitter بين positions كان بيـtrigger:
   - POSSESSION_CHANGE كل frame (الـ closest player يتغير)
@@ -592,7 +592,7 @@ reports/report_fulltime_<timestamp>.pdf
   - FAST_BREAK cooldown: 4s + ≥1 defender visible
   - Phantom suppression: لو phantom streak > 2 frames، الـ rules engine يلغي pending shots ويوقف emit events
 
-### 11. ❌ Camera angle changes break everything
+### 11. Camera angle changes break everything
 - **العَرَض**: لما الكاميرا تتغير (wide → close-up → behind net)، الجون disappear، tracking يضيع
 - **السبب**: dynamic_goal_box بيتأثر بالـ angle، court_mask بيـcalibrate غلط
 - **الحل**:
@@ -600,7 +600,7 @@ reports/report_fulltime_<timestamp>.pdf
   - `court_mask.py` colour-agnostic + auto-recalibration كل 4 frames
   - `_check_goal_smart` يستخدم static regions كـ fallback عند فشل dynamic
 
-### 12. ❌ FPS dropped from 30 → 5 with all features
+### 12. FPS dropped from 30 → 5 with all features
 - **العَرَض**: video stuttering, cv2 lag
 - **السبب**: 6 filters متتالية كلها يشتغلوا full-frame كل infer
 - **الحل**:
@@ -611,31 +611,31 @@ reports/report_fulltime_<timestamp>.pdf
   - `goal_replay.downscale = 0.5` (4× memory savings)
   - OCR في background thread (non-blocking)
 
-### 13. ❌ EasyOCR install broke OpenCV GUI
+### 13. EasyOCR install broke OpenCV GUI
 - **العَرَض**: `cv2.error: namedWindow not implemented`
 - **السبب**: `easyocr` يجيب `opencv-python-headless` كـ dep، يلغي الـ GUI
 - **الحل**: شيل headless + force-reinstall opencv-python (موثَّق في setup section)
 
-### 14. ❌ Ball-tracking كان بيـover-correct (Continuity bonuses)
+### 14. Ball-tracking كان بيـover-correct (Continuity bonuses)
 - **العَرَض**: الكرة تلصق بمكان قديم، تتأخر عن الحركة الحقيقية
 - **السبب**: ضافنا `+0.50 bonus` للـ candidates close to last_ball_pos → النظام بقي **يفضل** detections في نفس المكان
 - **الحل**: شيلنا الـ continuity bonuses تماماً. الـ scoring البسيط (penalty واحد للقفزات الكبيرة + hand magnet) أحسن
 
-### 15. ❌ Anti-head penalty كان يرفض الكرة عند الـ release
+### 15. Anti-head penalty كان يرفض الكرة عند الـ release
 - **العَرَض**: الكرة في إيد اللاعب فوق راسه (release moment) → النظام يخسرها
 - **السبب**: anti-head penalty كان gated على `not in_hand`. اللاعب يطلق shot عالي → الكرة فوق راسه + قريبة من wrist → in_hand=True → penalty يتلغي → score يرتفع → كله تمام؟ لا، عشان `is_head` كان بيـfire لو الكرة جوا الـ bbox الأعلى، حتى لو قريبة من wrist
 - **الحل**: nose-reject بالـ keypoint بدلاً من bbox-region penalty. الـ bbox-based head check بقي gated على `not in_hand`
 
-### 16. ❌ Ultimate fix: Kalman trajectory tracking
+### 16. Ultimate fix: Kalman trajectory tracking
 - **التشخيص النهائي**: كل الفلاتر اللي ضافناها كانت تعمل قرار في **frame واحد**. الكرة الحقيقية والـ false positives ممكن يبقوا متطابقين في الـ frame الواحد. الفرق بيظهر في **الزمن**: الكرة بتتحرك بسرعة وتسارع متناسقين، الرأس/الملصقة لأ
 - **الحل**: `ball_kalman.py` — Kalman Filter بـ Mahalanobis gating
 - **النتيجة**: detections بعيدة عن المسار المتوقع ترفض **تلقائياً**، بصرف النظر عن أي شيء آخر. ده اللي بيستخدمه أي نظام احترافي (Hawk-Eye, TrackMan, Opta)
 
 ---
 
-## ⚖️ الحالة الحالية
+## الحالة الحالية
 
-### ✅ بيشتغل صح
+### بيشتغل صح
 - Player tracking (BoT-SORT + ReID + persistent IDs)
 - Ball detection (fine-tuned model، median conf 0.72)
 - Ball Kalman tracking (gating + smoothing)
@@ -647,14 +647,14 @@ reports/report_fulltime_<timestamp>.pdf
 - OCR jersey numbers (async)
 - Multi-session player gallery
 
-### ⚠️ يشتغل بقيود
+### يشتغل بقيود
 - **Court mask**: يفشل في wide camera angles (visibility < 6%)
 - **Goal post detector**: ineffective خلف الـ net angles
 - **OCR**: لاعبين بعيدين أو محبوسة أرقامهم → no lock
 - **Ball detection على فيديوهات جديدة**: محتاج auto_label + train cycle لكل ماتش جديد
 - **Court calibration**: لازم homography_matrix.npy موجود للـ meter accuracy
 
-### ❌ مش شغّال (بعد)
+### مش شغّال (بعد)
 - Real-time team tactic classification (zone defense, 6-0, 5+1) — جزء من handball_coach.py لكن مش accurate
 - Foul / 1v1 detection
 - Penalty (7m) shot detection بدقة
@@ -662,7 +662,7 @@ reports/report_fulltime_<timestamp>.pdf
 
 ---
 
-## 🚀 Future Work
+## Future Work
 
 ### Priority 1 (high impact)
 - **Custom handball ball model**: re-train على dataset أكبر (5000+ samples) من ماتشات متعددة
@@ -684,7 +684,7 @@ reports/report_fulltime_<timestamp>.pdf
 
 ---
 
-## 📚 المراجع
+## المراجع
 
 - **IDEA/**: screenshots من Once Sport، Data Video 2007، Scoutz + sample PDFs
 - **YOLOv8**: ultralytics docs
@@ -692,9 +692,9 @@ reports/report_fulltime_<timestamp>.pdf
 - **EasyOCR**: github.com/JaidedAI/EasyOCR
 - **Kalman Filter**: Welch & Bishop, "An Introduction to the Kalman Filter"
 
-## 📄 License
+## License
 Internal project — لا توزيع.
 
-## 👥 المساهمون
+## المساهمون
 - Omar Essam Salah — owner / coach / vision
 - Claude (AI engineering pair) — implementation + debugging
