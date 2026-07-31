@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0d11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="stylesheet" href="/style.css">
+<title>Handball Studio</title>
+</head>
+<body>
+
+<!-- Connect overlay (shown until a server is reachable) -->
+<div id="connect" class="overlay">
+  <div class="connect-card">
+    <div class="logo">🤾</div>
+    <h1>Handball Studio</h1>
+    <p class="muted">Connecting to your match server…</p>
+    <div class="spinner" id="connSpin"></div>
+    <div id="connMsg" class="muted small"></div>
+    <input id="serverInput" placeholder="server address (e.g. 192.168.1.20:8000)">
+    <button class="btn primary" onclick="App.manualConnect()">Connect</button>
+  </div>
+</div>
+
+<!-- Immersive loading screen (AI engine init) -->
+<div id="loading" class="overlay hidden">
+  <canvas id="loadCanvas"></canvas>
+  <div class="load-center">
+    <div class="load-ring"><div class="load-core">🤾</div></div>
+    <div class="load-title">INITIALIZING&nbsp;AI&nbsp;ENGINE</div>
+    <div class="load-bar"><i id="loadFill"></i></div>
+    <div class="load-sub" id="loadSub">booting YOLOv8-pose · ball-net · trackers</div>
+  </div>
+</div>
+
+<!-- App shell -->
+<div id="app" class="app hidden">
+  <header class="topbar">
+    <div class="score">
+      <span class="team-a" id="sa">0</span>
+      <span class="dash">–</span>
+      <span class="team-b" id="sb">0</span>
+    </div>
+    <div class="meta">
+      <span id="teamsLbl">Home vs Away</span>
+      <span class="sep">·</span>
+      <span id="clock">P1 00:00</span>
+      <span class="live-pill off" id="livePill"><i></i><span id="liveTxt">offline</span></span>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- MATCH -->
+    <section class="page on" id="page-match">
+      <div class="video-card">
+        <img id="vid" alt="live view">
+        <div class="vid-tag"><span id="fps">0</span> fps · <span id="ball">—</span></div>
+      </div>
+      <div class="playback">
+        <button class="pb-btn" id="pbPlay" onclick="App.togglePause()" title="Play/Pause">⏸</button>
+        <button class="pb-btn" id="pbStep" onclick="App.step()" title="Frame step">⏭</button>
+        <input class="range seek" id="seekBar" type="range" min="0" max="1000" value="0"
+               oninput="App.seek(this.value)">
+        <div class="speeds" id="speeds">
+          <button data-spd="0.25">0.25×</button><button data-spd="0.5">0.5×</button>
+          <button data-spd="1" class="on">1×</button><button data-spd="2">2×</button><button data-spd="4">4×</button>
+        </div>
+      </div>
+      <div class="stat-strip">
+        <div class="stat"><div class="k">Possession</div><div class="v" id="poss">—</div></div>
+        <div class="stat"><div class="k">Shots</div><div class="v" id="shots">—</div></div>
+        <div class="stat"><div class="k">Fast breaks</div><div class="v" id="fb">—</div></div>
+        <div class="stat"><div class="k">Passes</div><div class="v" id="passes">—</div></div>
+      </div>
+      <div id="aiVerdict" class="ai-verdict" style="display:none"></div>
+      <h3 class="sub">Recent events</h3>
+      <div id="events" class="list"></div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section class="page" id="page-players">
+      <div class="banner" id="reidBanner">Persistent identities: 0</div>
+      <div id="players" class="list"></div>
+    </section>
+
+    <!-- TECHNIQUE (biomechanics) -->
+    <section class="page" id="page-technique">
+      <h3 class="sub">Biomechanics — live technique</h3>
+      <div id="technique" class="tech-list"></div>
+      <div class="muted small" style="margin-top:8px">
+        Tip: turn on the <b>Skeleton</b> overlay in Controls to see the pose the metrics come from.
+      </div>
+    </section>
+
+    <!-- TACTICS -->
+    <section class="page" id="page-tactics">
+      <h3 class="sub">Team shape</h3>
+      <div id="formation" class="form-cards"></div>
+      <h3 class="sub">Shot map <span class="muted small" id="shotCount"></span></h3>
+      <canvas id="court" class="court" width="640" height="360"></canvas>
+      <div class="legend">
+        <span><i class="dot a"></i>Home</span><span><i class="dot b"></i>Away</span>
+        <span><i class="dot ring"></i>shot</span><span><i class="dot fill"></i>goal</span>
+      </div>
+      <h3 class="sub">Pre-goal tactical freezes</h3>
+      <div id="goals" class="goal-grid"></div>
+    </section>
+
+    <!-- REPORTS (pro Shot/Save reports) -->
+    <section class="page" id="page-reports">
+      <div class="rep-bar">
+        <select id="repPlayer" onchange="App.renderReport()"></select>
+        <div class="seg">
+          <button id="repModeShot" class="on" onclick="App.repMode('shot')">Shot</button>
+          <button id="repModeSave" onclick="App.repMode('save')">Save</button>
+        </div>
+      </div>
+      <div id="repHeader" class="rep-header"></div>
+      <h3 class="sub">Goal-mouth summary</h3>
+      <div id="repSummary"></div>
+      <h3 class="sub">By court zone</h3>
+      <div id="repZones" class="zone-grid"></div>
+      <h3 class="sub">Outcome</h3>
+      <div id="repOutcome" class="rep-outcome"></div>
+      <h3 class="sub">＋ Tag a shot (event tagging)</h3>
+      <div class="rep-add">
+        <div class="r2"><input id="tgName" placeholder="Player"><input id="tgNum" type="number" placeholder="#" style="max-width:64px"></div>
+        <div class="r2"><select id="tgTeam"><option value="team_a">Home</option><option value="team_b">Away</option></select>
+          <select id="tgGk"><option value="">GK (optional)</option></select></div>
+        <select id="tgZone"></select>
+        <div class="goalpick"><div class="gp-title muted small">where in the goal?</div><div id="tgCells" class="gp-grid"></div>
+          <div id="tgOff" class="gp-off"></div></div>
+        <div class="seg out" id="tgOutcome"></div>
+        <button class="btn primary wide" onclick="App.tagShot()">＋ Add shot</button>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="page" id="page-controls">
+      <h3 class="sub">AI Overlays</h3>
+      <div class="toggle-grid">
+        <label class="switch"><span>Skeleton wireframe</span><input type="checkbox" data-ctl="skeleton"><i></i></label>
+        <label class="switch"><span>Bounding boxes</span><input type="checkbox" data-ctl="boxes"><i></i></label>
+        <label class="switch"><span>Ball trajectory</span><input type="checkbox" data-ctl="trajectory" checked><i></i></label>
+        <label class="switch"><span>Player IDs</span><input type="checkbox" data-ctl="ids" checked><i></i></label>
+        <label class="switch"><span>Foot markers</span><input type="checkbox" data-ctl="markers" checked><i></i></label>
+        <label class="switch"><span>Heatmap</span><input type="checkbox" data-ctl="heatmap"><i></i></label>
+      </div>
+
+      <h3 class="sub">AI Tuning <span class="muted small">(live)</span></h3>
+      <div class="slider-box">
+        <div class="slider-row"><label>Player confidence</label><output id="out-player_conf">0.40</output></div>
+        <input class="range" type="range" min="0.05" max="0.90" step="0.01" value="0.40" data-ctl="player_conf">
+        <div class="slider-row"><label>Ball confidence</label><output id="out-ball_conf">0.03</output></div>
+        <input class="range" type="range" min="0.02" max="0.50" step="0.01" value="0.03" data-ctl="ball_conf">
+      </div>
+
+      <h3 class="sub">Match controls</h3>
+      <div class="ctrl-grid">
+        <button class="ctrl" onclick="App.cmd('r')"><b>Recalibrate</b><span>team colours</span></button>
+        <button class="ctrl" onclick="App.cmd('f')"><b>Flip Sides</b><span>half-time</span></button>
+        <button class="ctrl accent" onclick="App.cmd('a')"><b>Goal: Home</b><span>manual +1</span></button>
+        <button class="ctrl accent" onclick="App.cmd('b')"><b>Goal: Away</b><span>manual +1</span></button>
+        <button class="ctrl" id="dbgBtn" onclick="App.cmd('d')"><b>Debug</b><span>overlay</span></button>
+        <button class="ctrl" onclick="App.cmd(' ')"><b>Resume</b><span>dismiss freeze</span></button>
+      </div>
+      <h3 class="sub">Source</h3>
+      <div class="source-box">
+        <input id="src" placeholder="video file (handball.mp4) or rtsp://…">
+        <div class="row">
+          <button class="btn primary" onclick="App.openSource()">Open</button>
+          <button class="btn" onclick="App.scanCameras()">Scan cameras</button>
+          <button class="btn danger" onclick="App.stopPipeline()">Stop</button>
+        </div>
+        <div id="scanResults" class="list"></div>
+      </div>
+      <h3 class="sub">Tools (run on the PC)</h3>
+      <div class="ctrl-grid">
+        <button class="ctrl" onclick="App.tool('label')"><b>🎯 Label Ball</b><span>mark positions</span></button>
+        <button class="ctrl" onclick="App.tool('train')"><b>🧠 Train Model</b><span>retrain ball</span></button>
+        <button class="ctrl" onclick="App.openCalib()"><b>📐 Calibrate</b><span>court corners — in browser</span></button>
+        <button class="ctrl" onclick="location.href='analyze.html'"><b>📋 Analyze Clip</b><span>upload video — full report</span></button>
+        <button class="ctrl" onclick="App.tool('build_apk')"><b>🔨 Build APK</b><span>phone app</span></button>
+      </div>
+      <button class="btn ghost wide" id="installBtn" hidden onclick="App.install()">＋ Install app on home screen</button>
+      <div class="muted small center" id="srvLbl"></div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab on" data-page="match"     onclick="App.go('match')">▦<span>Match</span></button>
+    <button class="tab"    data-page="players"   onclick="App.go('players')">👥<span>Players</span></button>
+    <button class="tab"    data-page="technique" onclick="App.go('technique')">🦾<span>Tech</span></button>
+    <button class="tab"    data-page="tactics"   onclick="App.go('tactics')">🎯<span>Tactics</span></button>
+    <button class="tab"    data-page="reports"   onclick="App.go('reports'); App.loadReports()">📋<span>Reports</span></button>
+    <button class="tab"    data-page="controls"  onclick="App.go('controls')">⚙<span>Controls</span></button>
+  </nav>
+</div>
+
+<!-- fullscreen image viewer -->
+<div id="viewer" class="overlay hidden" onclick="App.closeViewer()">
+  <img id="viewerImg">
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

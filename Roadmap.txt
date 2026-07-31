@@ -1,0 +1,61 @@
+📖 Handball AI Project Status & Roadmap
+Target: Professional Offline Tactical Assistant for Handball Coaches.
+
+🏗 Current Architecture (The "Fast-Track" Logic)
+We have optimized the pipeline to run at 30-40+ FPS on a Dell Precision Workstation (RTX GPU) by implementing a Zero-I/O & Async Strategy.
+
+Key Components:
+Dual-Engine Detector (src/detector.py):
+
+Runs yolov8s-pose.pt for players to extract Skeleton Keypoints (for wrist/hand tracking).
+
+Runs a lightweight yolov8n.pt (Object detect) dedicated to the Ball (Class 32) because Pose models are blind to objects.
+
+Smart Tracker (src/tracker.py):
+
+Uses BoT-SORT with ReID disabled for maximum speed.
+
+Anti-Shoe Filter: Mathematical logic to reject "Ball" detections located in the bottom 15% of a player's bounding box (Prevents shoes being mistaken for the ball).
+
+Broadcast-Ready Rules Engine (src/handball_rules.py):
+
+Hyper Goal Catching: Detects goals based on physics (deceleration inside net), context (recent shot), and "Ghost Goals" (ball vanishing inside the goal area).
+
+Scene-Cut Adaptation: Detects massive ball teleportation (TV camera cuts) and resets cooldowns/memory to prevent double-counting replays as goals.
+
+Strict Possession: Only assigns ball possession if the ball is near the player's upper body (hands/torso), ignoring feet.
+
+🛠 What we have Done (Optimization Phase)
+Disabled Heavy I/O: Stopped synchronous PlayerDB auto-enrollment and disk-logging during the main loop to fix stuttering.
+
+Inference Skipping: Implemented infer_every logic where the tracker re-uses old tracks during non-inference frames to boost FPS.
+
+Performance Scaling: Moved to imgsz=640 for players and imgsz=960 for ball detection (when precision is needed) with Hardware Decoding.
+
+🚀 Next Steps for Claude (The "Analytical Studio" Phase)
+The goal is to transition from a "Visual Tracker" to a "Professional Analysis Studio" without losing the 40+ FPS speed.
+
+1. Asynchronous Analytics (Multiprocessing)
+Implement a Data Queue to send track data (x, y, track_id, team) to a background process.
+
+The background process should handle Heatmap generation, Distance covered (KM), and Sprint detection without blocking the camera thread.
+
+2. Player Profiling & ReID (The Archivist)
+Re-enable auto_enroll but only for players inside the court boundaries (Court Masking).
+
+Use a very light ReID model (like osnet_x0_25) to maintain player identity even when they leave and re-enter the frame.
+
+3. Tactical Skill Extraction
+Detect specific handball skills: Jump shots, Pivot turns, and Wing-to-Center passes.
+
+Link these skills to the PlayerID to build a "Style Profile" (e.g., "Player #7 prefers right-side penetrations").
+
+4. Court Understanding (Homography)
+Refine the CourtDetector to auto-load homography_matrix.npy and convert all pixel movements into Meters per Second.
+
+💡 Notes for the Next AI Assistant:
+Don't break the FPS: Any new feature MUST be async or backgrounded. The main loop must remain a "High-Speed Vision Pipe".
+
+Ollama Integration: Ollama (Llama 3.2) should only be called every 30-60 seconds for high-level tactical summaries, never per frame.
+
+Handball Specifics: Keep following IHF rules (Passive play, 6m/9m zone logic).

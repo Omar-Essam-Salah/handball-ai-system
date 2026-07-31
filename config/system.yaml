@@ -1,0 +1,39 @@
+detection:
+  # imgsz=1280 — 4× more pixels vs 640; resolves distant players clearly.
+  # Requires FP16 + ~1.8 GB VRAM for YOLOv8m; fits RTX 3000 6 GB.
+  imgsz: 1280
+  confidence: 0.25          # legacy field (kept for hot-reload compat)
+  ball_confidence: 0.15     # ball_conf: 0.15
+  # Dynamic per-size thresholds (applied after YOLO NMS)
+  small_conf: 0.15          # person bbox area < small_area_px
+  large_conf: 0.30          # person bbox area >= small_area_px
+  small_area_px: 1000       # px² boundary at native imgsz resolution
+  min_crops: 30
+
+player_db:
+  auto_enroll_frames: 45
+  cross_session_thresh: 0.62
+  hysteresis: 0.12
+  lock_frames: 150
+  min_confidence: 0.5
+
+coach:
+  fast_break_dist_m: 8.0
+  fatigue_distance_threshold_m: 5500.0
+  fatigue_sprint_threshold: 22
+  passive_play_frames: 125
+  period_duration_s: 1800
+
+display:
+  fps_target: 30
+  hud_enabled: true
+  scale: 1.0
+  show_ghost_tracks: true
+  sidebar_enabled: true
+
+stamina:
+  floor_pct: 10.0
+  recovery_per_s: 0.25
+  run_depletion_per_s: 0.1
+  sprint_depletion_per_s: 0.8
+  sprint_speed_ms: 5.5

@@ -1,0 +1,57 @@
+Collecting altair
+  Using cached altair-6.0.0-py3-none-any.whl.metadata (11 kB)
+Collecting blinker
+  Using cached blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting cachetools
+  Using cached cachetools-7.0.5-py3-none-any.whl.metadata (5.6 kB)
+Collecting gitpython
+  Using cached gitpython-3.1.46-py3-none-any.whl.metadata (13 kB)
+Collecting pydeck
+  Using cached pydeck-0.9.2-py2.py3-none-any.whl.metadata (4.2 kB)
+Collecting protobuf
+  Using cached protobuf-7.34.1-cp310-abi3-win_amd64.whl.metadata (595 bytes)
+Collecting watchdog
+  Downloading watchdog-6.0.0-py3-none-win_amd64.whl.metadata (44 kB)
+Collecting tornado
+  Downloading tornado-6.5.5-cp39-abi3-win_amd64.whl.metadata (2.9 kB)
+Requirement already satisfied: jinja2 in c:\users\dell\appdata\local\programs\python\python312\lib\site-packages (from altair) (3.1.6)
+Collecting jsonschema>=3.0 (from altair)
+  Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting narwhals>=1.27.1 (from altair)
+  Downloading narwhals-2.19.0-py3-none-any.whl.metadata (14 kB)
+Requirement already satisfied: packaging in c:\users\dell\appdata\local\programs\python\python312\lib\site-packages (from altair) (26.1)
+Requirement already satisfied: typing-extensions>=4.12.0 in c:\users\dell\appdata\local\programs\python\python312\lib\site-packages (from altair) (4.15.0)
+Collecting gitdb<5,>=4.0.1 (from gitpython)
+  Downloading gitdb-4.0.12-py3-none-any.whl.metadata (1.2 kB)
+Requirement already satisfied: numpy>=1.16.4 in c:\users\dell\appdata\local\programs\python\python312\lib\site-packages (from pydeck) (2.4.4)
+Collecting smmap<6,>=3.0.1 (from gitdb<5,>=4.0.1->gitpython)
+  Downloading smmap-5.0.3-py3-none-any.whl.metadata (4.6 kB)
+Requirement already satisfied: MarkupSafe>=2.0 in c:\users\dell\appdata\local\programs\python\python312\lib\site-packages (from jinja2->altair) (3.0.3)
+Collecting attrs>=22.2.0 (from jsonschema>=3.0->altair)
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=3.0->altair)
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=3.0->altair)
+  Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=3.0->altair)
+  Downloading rpds_py-0.30.0-cp312-cp312-win_amd64.whl.metadata (4.2 kB)
+Downloading altair-6.0.0-py3-none-any.whl (795 kB)
+   --------------------------------------- 795.4/795.4 kB 44.4 kB/s eta 0:00:00
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Downloading cachetools-7.0.5-py3-none-any.whl (13 kB)
+Downloading gitpython-3.1.46-py3-none-any.whl (208 kB)
+Downloading pydeck-0.9.2-py2.py3-none-any.whl (11.3 MB)
+   ---------------------------------------- 11.3/11.3 MB 777.5 kB/s eta 0:00:00
+Downloading protobuf-7.34.1-cp310-abi3-win_amd64.whl (437 kB)
+Downloading watchdog-6.0.0-py3-none-win_amd64.whl (79 kB)
+Downloading tornado-6.5.5-cp39-abi3-win_amd64.whl (448 kB)
+Downloading gitdb-4.0.12-py3-none-any.whl (62 kB)
+Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Downloading narwhals-2.19.0-py3-none-any.whl (446 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+Downloading rpds_py-0.30.0-cp312-cp312-win_amd64.whl (240 kB)
+Downloading smmap-5.0.3-py3-none-any.whl (24 kB)
+Installing collected packages: watchdog, tornado, smmap, rpds-py, protobuf, narwhals, cachetools, blinker, attrs, referencing, pydeck, gitdb, jsonschema-specifications, gitpython, jsonschema, altair
+Successfully installed altair-6.0.0 attrs-26.1.0 blinker-1.9.0 cachetools-7.0.5 gitdb-4.0.12 gitpython-3.1.46 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 narwhals-2.19.0 protobuf-7.34.1 pydeck-0.9.2 referencing-0.37.0 rpds-py-0.30.0 smmap-5.0.3 tornado-6.5.5 watchdog-6.0.0

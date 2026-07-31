@@ -1,0 +1,90 @@
+# ── Licensing secrets / artifacts — NEVER commit these ──
+licensing/vendor_private_key.pem
+vendor_private_key.pem
+license.key
+*.key
+config/.runtime.cache
+.runtime.cache
+
+# ── Secrets & real credentials (camera password, API keys, calibration) ──
+config/camera.yaml
+config/gemini_api_key.key
+config/*.pem
+config/court_calibration.json
+config/homography_matrix.npy
+config/match.json
+config/logos/
+homography_matrix.npy
+*.pem
+
+# ── Client / match DATA & outputs (privacy — never publish) ──
+data/
+reports/
+runs/
+logs/
+training/
+analytics/
+*.db
+*.jsonl
+*.log
+match_log.json
+tactical_insight.json
+detection_log.jsonl
+multi_session_reid*.json*
+
+# ── Videos & media (huge; never on GitHub) ──
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# ── ML model weights (large / trained IP) ──
+*.pt
+*.onnx
+*.engine
+*.npy
+
+# ── Built apps / large binary artifacts ──
+*.apk
+*.aab
+
+# ── Big generated images / masks / demos ──
+court_mask_*.png
+mini_court_*.png
+diagnose_output.png
+ocr_test_output.png
+*_output.png
+
+# Encrypted + raw model weights
+*.pt.enc
+
+# Build artifacts from Cython obfuscation
+build/
+*.c
+*.pyd
+*.so
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors / tooling / local
+.venv/
+.claude/
+.continue/
+.specify/
+.vscode/
+.idea/
+IDEA/
+claude instructions/
+porblems/
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+*.bin
+
+# ── Licensing / DRM mechanism — exclude from public showcase ──
+licensing/

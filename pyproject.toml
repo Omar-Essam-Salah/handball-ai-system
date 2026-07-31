@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "handball-project"
+version = "0.1.0"
+description = "A project for handball data analysis and computer vision."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+dependencies = [
+    "numpy>=2.0.0",
+    "scipy>=1.10.0",
+    "pyarrow>=15.0.0",
+    "opencv-python>=4.8.0",
+    "regex",
+    "pydantic>=2.0.0",
+    "ultralytics>=8.1.0",
+    "pyyaml",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/handball-project"
+
+[tool.setuptools]
+packages = ["handball_project"]
+
+[tool.setuptools.package-data]
+handball_project = ["*.txt", "*.dat"]

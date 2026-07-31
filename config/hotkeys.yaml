@@ -1,0 +1,28 @@
+# Hotkey -> event mapping. Edit freely.
+# team: red (your team) or blue (opponent)
+
+clip:
+  pre_roll_s: 5
+  post_roll_s: 3
+
+events:
+  # ---- Red (your team) ----
+  S:        { event: shot,        team: red }
+  G:        { event: goal,        team: red }
+  P:        { event: pass,        team: red }
+  T:        { event: turnover,    team: red }
+  B:        { event: block,       team: red }
+  M:        { event: seven_m,     team: red }     # M = 7-meter throw
+  C:        { event: counter,     team: red }
+  F:        { event: failed_att,  team: red }
+  A:        { event: save,        team: red }     # GK save
+  # ---- Blue (opponent) ----
+  "Shift+S": { event: shot,        team: blue }
+  "Shift+G": { event: goal,        team: blue }
+  "Shift+P": { event: pass,        team: blue }
+  "Shift+T": { event: turnover,    team: blue }
+  "Shift+B": { event: block,       team: blue }
+  "Shift+M": { event: seven_m,     team: blue }
+  "Shift+C": { event: counter,     team: blue }
+  "Shift+F": { event: failed_att,  team: blue }
+  "Shift+A": { event: save,        team: blue }

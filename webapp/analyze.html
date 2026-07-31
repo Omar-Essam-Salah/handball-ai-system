@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d11">
+<title>تحليل هجمات — Handball Studio</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;}
+  html,body{background:#0b0d11;color:#e8f0f7;min-height:100%;}
+  .top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#11141b;
+    border-bottom:1px solid #1e2430;position:sticky;top:0;z-index:5;}
+  .top a{color:#9fb4c8;text-decoration:none;font-size:20px;}
+  .top h1{font-size:16px;font-weight:700;flex:1;text-align:center;}
+  main{max-width:640px;margin:0 auto;padding:16px;}
+
+  #uploadCard{background:#11141b;border:1px solid #1e2430;border-radius:14px;padding:22px;text-align:center;}
+  #uploadCard .icon{font-size:42px;margin-bottom:8px;}
+  #uploadCard h2{font-size:16px;margin-bottom:6px;}
+  #uploadCard p{color:#8ea3b8;font-size:13px;margin-bottom:16px;line-height:1.6;}
+  input[type=file]{display:none;}
+  .btn{display:inline-block;border:none;border-radius:10px;padding:13px 26px;font-size:14px;
+    font-weight:700;cursor:pointer;background:#00b4ff;color:#04121e;}
+  .btn:active{transform:scale(.97);}
+  .btn.wide{width:100%;}
+  .btn:disabled{opacity:.4;}
+  .teams-row{display:flex;gap:8px;margin:14px 0;}
+  .teams-row input{flex:1;background:#0e1219;border:1px solid #24405c;border-radius:8px;
+    color:#e8f0f7;padding:10px;font-size:13px;text-align:center;}
+  #fname{margin-top:10px;font-size:12px;color:#38d6ff;word-break:break-all;}
+
+  #progressCard{display:none;background:#11141b;border:1px solid #1e2430;border-radius:14px;
+    padding:20px;margin-top:16px;text-align:center;}
+  #progressCard.show{display:block;}
+  .spinner{width:34px;height:34px;border:3px solid #1e2430;border-top-color:#00b4ff;
+    border-radius:50%;margin:0 auto 12px;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .bar{height:8px;background:#1a2230;border-radius:5px;overflow:hidden;margin-top:12px;}
+  .bar i{display:block;height:100%;background:#00b4ff;width:0%;transition:width .3s;}
+  #progressTxt{font-size:13px;color:#9fb4c8;margin-top:8px;}
+
+  #err{display:none;background:#2a1017;border:1px solid #5c2430;color:#ff8fa0;
+    border-radius:10px;padding:14px;margin-top:14px;font-size:13px;}
+  #err.show{display:block;}
+
+  #results{display:none;margin-top:18px;}
+  #results.show{display:block;}
+  h3.sub{font-size:14px;color:#9fb4c8;margin:20px 0 10px;font-weight:700;}
+
+  .moment{background:#11141b;border:1px solid #1e2430;border-radius:14px;overflow:hidden;margin-bottom:16px;}
+  .moment img{width:100%;display:block;background:#000;}
+  .moment .body{padding:14px;}
+  .moment .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;
+    border-radius:20px;margin-bottom:8px;}
+  .tag.goal{background:rgba(0,229,120,.15);color:#00e578;}
+  .tag.save{background:rgba(56,182,255,.15);color:#38b6ff;}
+  .tag.missed_out{background:rgba(255,176,32,.15);color:#ffb020;}
+  .moment .title{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .moment .row{font-size:12.5px;color:#c3d3e0;margin:4px 0;line-height:1.7;}
+  .moment .row b{color:#e8f0f7;}
+  .moment .note{font-size:11px;color:#5b7186;margin-top:8px;border-top:1px solid #1e2430;padding-top:8px;}
+
+  .summary-card{background:#11141b;border:1px solid #1e2430;border-radius:14px;padding:16px;margin-bottom:14px;}
+  .summary-card h4{font-size:15px;margin-bottom:10px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .stat{background:#0e1219;border-radius:8px;padding:8px;text-align:center;}
+  .stat .v{font-size:17px;font-weight:800;color:#00b4ff;}
+  .stat .k{font-size:10px;color:#8ea3b8;margin-top:2px;}
+  .pill-list{font-size:13px;line-height:2;}
+  .pill-list .good::before{content:"✓ ";color:#00e578;}
+  .pill-list .bad::before{content:"⚠ ";color:#ff8fa0;}
+
+  #newBtn{margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="top">
+  <a href="index.html">‹</a>
+  <h1>📋 تحليل الهجمات</h1>
+  <span style="width:20px"></span>
+</div>
+
+<main>
+  <div id="uploadCard">
+    <div class="icon">🎥</div>
+    <h2>ارفع مقطع فيديو للمباراة</h2>
+    <p>هيتم تحليل المقطع تلقائياً واستخراج كل لحظة حرجة (هدف / تصدي / تسديدة خارج المرمى)
+      مع الرسم التكتيكي الكامل وتقرير عربي لكل هجمة، وفي النهاية تقرير نقاط القوة والضعف.</p>
+    <div class="teams-row">
+      <input id="teamA" placeholder="اسم الفريق الأول" value="الفريق الأول">
+      <input id="teamB" placeholder="اسم الفريق الثاني" value="الفريق الثاني">
+    </div>
+    <div class="teams-row" style="margin-top:0">
+      <select id="engine" style="flex:1;background:#0e1219;border:1px solid #24405c;
+        border-radius:8px;color:#e8f0f7;padding:10px;font-size:13px;">
+        <option value="gemini" selected>⚡ Gemini — سريع وذكي (يستهلك حصة API)</option>
+        <option value="cv">🖥 تتبع محلي — دقيق بالبكسل وأبطأ (مجاني)</option>
+      </select>
+    </div>
+    <label class="btn wide" for="videoFile">📁 اختر فيديو</label>
+    <input type="file" id="videoFile" accept="video/*">
+    <div id="fname"></div>
+    <button class="btn wide" id="goBtn" style="margin-top:10px" disabled onclick="A.upload()">🚀 ابدأ التحليل</button>
+  </div>
+
+  <div id="progressCard">
+    <div class="spinner"></div>
+    <div id="progressTxt">جاري رفع الفيديو…</div>
+    <div class="bar"><i id="progressFill"></i></div>
+  </div>
+
+  <div id="err"></div>
+
+  <div id="results">
+    <h3 class="sub">📊 التقرير النهائي</h3>
+    <div id="summaryBox"></div>
+    <h3 class="sub">🎯 اللحظات الحرجة</h3>
+    <div id="momentsBox"></div>
+    <button class="btn wide" id="newBtn" onclick="A.reset()">↺ تحليل فيديو جديد</button>
+  </div>
+</main>
+
+<script>
+const A = (() => {
+  const base = localStorage.getItem('srv') || '';
+  const api  = p => base + p;
+  const $ = id => document.getElementById(id);
+  let file = null, pollTimer = null;
+
+  $('videoFile').addEventListener('change', e => {
+    file = e.target.files[0] || null;
+    $('fname').textContent = file ? `${file.name}  (${(file.size/1e6).toFixed(1)} MB)` : '';
+    $('goBtn').disabled = !file;
+  });
+
+  function showErr(msg) {
+    const e = $('err'); e.textContent = '✗ ' + msg; e.classList.add('show');
+  }
+
+  async function upload() {
+    if (!file) return;
+    $('err').classList.remove('show');
+    $('uploadCard').style.display = 'none';
+    $('progressCard').classList.add('show');
+    $('progressTxt').textContent = 'جاري رفع الفيديو…';
+
+    const fd = new FormData();
+    fd.append('video', file);
+    const teamA = encodeURIComponent($('teamA').value.trim() || 'الفريق الأول');
+    const teamB = encodeURIComponent($('teamB').value.trim() || 'الفريق الثاني');
+    const engine = $('engine').value;
+
+    try {
+      const r = await fetch(api(`/analyze/upload?team_a=${teamA}&team_b=${teamB}&engine=${engine}`),
+                            { method: 'POST', body: fd });
+      const d = await r.json();
+      if (!d.ok) { showErr(d.error || 'فشل الرفع'); resetToUpload(); return; }
+      poll(d.job_id);
+    } catch (e) {
+      showErr('تعذر الاتصال بالسيرفر — تأكد إن الجهاز على نفس الشبكة.');
+      resetToUpload();
+    }
+  }
+
+  function poll(jobId) {
+    pollTimer = setInterval(async () => {
+      try {
+        const r = await fetch(api(`/analyze/progress/${jobId}`), { cache: 'no-store' });
+        const d = await r.json();
+        if (!d.ok) { clearInterval(pollTimer); showErr(d.error || 'خطأ غير معروف'); resetToUpload(); return; }
+        if (d.status === 'error') {
+          clearInterval(pollTimer); showErr(d.error || 'فشل التحليل'); resetToUpload(); return;
+        }
+        const pct = d.total ? Math.min(100, Math.round(100 * d.processed / d.total)) : 0;
+        $('progressFill').style.width = pct + '%';
+        // Gemini reports coarse 3-stage progress (upload/wait/generate), the
+        // local CV engine reports real per-frame counts — only show the
+        // frame tally when it's actually meaningful (fine-grained).
+        const detail = d.total > 20 ? ` (${d.processed}/${d.total} فريم)` : '';
+        $('progressTxt').textContent = d.status === 'queued'
+          ? 'في الانتظار…' : `جاري التحليل… ${pct}%${detail}`;
+        if (d.status === 'done') {
+          clearInterval(pollTimer);
+          const rr = await fetch(api(`/analyze/result/${jobId}`), { cache: 'no-store' });
+          const rd = await rr.json();
+          if (!rd.ok) { showErr(rd.error || 'تعذر جلب النتيجة'); resetToUpload(); return; }
+          render(rd);
+        }
+      } catch (e) { /* transient — keep polling */ }
+    }, 1500);
+  }
+
+  const TAG_AR = { goal: 'هدف', save: 'تصدي', missed_out: 'تسديدة خارجة' };
+
+  function render(data) {
+    $('progressCard').classList.remove('show');
+    $('results').classList.add('show');
+
+    const s = data.summary;
+    $('summaryBox').innerHTML = Object.keys(s).map(team => {
+      const t = s[team];
+      const strengths = t.strengths.map(x => `<div class="good">${x}</div>`).join('');
+      const weaknesses = t.weaknesses.map(x => `<div class="bad">${x}</div>`).join('');
+      // stat-grid needs real numeric counters (the local CV engine has them
+      // from the rules engine); the Gemini engine gives qualitative
+      // strengths/weaknesses only — show that alone rather than fabricate numbers.
+      const hasStats = t.goals !== undefined;
+      const stats = hasStats ? `<div class="stat-grid">
+          <div class="stat"><div class="v">${t.goals}</div><div class="k">أهداف</div></div>
+          <div class="stat"><div class="v">${t.shot_accuracy_pct}%</div><div class="k">كفاءة تسديد</div></div>
+          <div class="stat"><div class="v">${t.goalkeeper.save_pct}%</div><div class="k">نسبة تصدي الحارس</div></div>
+        </div>` : '';
+      return `<div class="summary-card">
+        <h4>${t.team_name}</h4>
+        ${stats}
+        <div class="pill-list">${strengths}${weaknesses}</div>
+      </div>`;
+    }).join('');
+
+    $('momentsBox').innerHTML = data.moments.map((m, i) => {
+      const r = m.report;
+      return `<div class="moment">
+        <img src="data:image/jpeg;base64,${m.frame_b64}" loading="lazy">
+        <div class="body">
+          <span class="tag ${m.event_type}">${TAG_AR[m.event_type] || m.event_type}</span>
+          <div class="title">${r.attack_title}</div>
+          <div class="row">⏱ ${r.video_time_range} &nbsp;·&nbsp; النتيجة: ${r.score_at_execution}</div>
+          <div class="row"><b>الثغرة الدفاعية:</b> ${r.defensive_error}</div>
+          <div class="row"><b>زاوية التسديد:</b> ${r.shooting_angle}</div>
+          ${r.score_after ? `<div class="row">النتيجة بعد الهجمة: <b>${r.score_after}</b></div>` : ''}
+          ${r.note ? `<div class="note">${r.note}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('') || '<p style="color:#8ea3b8;font-size:13px">لم تُرصد لحظات حرجة (تسديدات/أهداف) في هذا المقطع.</p>';
+  }
+
+  function resetToUpload() {
+    $('progressCard').classList.remove('show');
+    $('uploadCard').style.display = 'block';
+  }
+  function reset() {
+    file = null; clearInterval(pollTimer);
+    $('videoFile').value = ''; $('fname').textContent = ''; $('goBtn').disabled = true;
+    $('results').classList.remove('show'); $('err').classList.remove('show');
+    $('progressFill').style.width = '0%';
+    resetToUpload();
+  }
+
+  return { upload, reset };
+})();
+</script>
+</body>
+</html>

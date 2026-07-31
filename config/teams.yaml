@@ -1,0 +1,17 @@
+team_a:
+  attacks_right: true
+  color_bgr:
+  - 60
+  - 60
+  - 220
+  name: Home
+  short_name: HME
+
+team_b:
+  attacks_right: false
+  color_bgr:
+  - 220
+  - 80
+  - 0
+  name: Away
+  short_name: AWY

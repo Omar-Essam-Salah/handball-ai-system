@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0d11">
+<title>Court Calibration — Handball Studio</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:#0b0d11;color:#e8f0f7;overflow:hidden;
+    touch-action:none;overscroll-behavior:none;}
+  .top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#11141b;
+    border-bottom:1px solid #1e2430;}
+  .top a{color:#9fb4c8;text-decoration:none;font-size:20px;line-height:1;padding:4px 8px;}
+  .top h1{font-size:15px;font-weight:700;flex:1;}
+  .pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:#1a2230;color:#9fb4c8;}
+  .pill.live{background:rgba(0,229,120,.12);color:#00e578;}
+  .pill.frozen{background:rgba(0,180,255,.12);color:#38b6ff;}
+  .pill.err{background:rgba(255,70,90,.14);color:#ff5c72;}
+  #instruct{padding:8px 14px;font-size:13px;font-weight:600;color:#38d6ff;background:#0e1219;
+    border-bottom:1px solid #1e2430;min-height:34px;}
+  #stage{position:relative;width:100%;background:#000;}
+  #cv{display:block;width:100%;height:100%;cursor:crosshair;}
+  #zoomLbl{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#cfe6ff;
+    font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;pointer-events:none;}
+  #waiting{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#5b7186;font-size:14px;font-weight:600;pointer-events:none;}
+  .bar{display:flex;gap:8px;padding:10px 12px;flex-wrap:wrap;align-items:center;background:#0e1219;}
+  .btn{border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;
+    background:#1a2230;color:#dce8f5;}
+  .btn:active{transform:scale(.96);}
+  .btn.primary{background:#00b4ff;color:#04121e;}
+  .btn.good{background:#00e578;color:#04180d;}
+  .btn.danger{background:#3a1520;color:#ff7288;}
+  .btn:disabled{opacity:.35;pointer-events:none;}
+  .btn.zoom{min-width:44px;text-align:center;font-size:16px;}
+  #chips{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:wrap;font-family:ui-monospace,monospace;font-size:11px;}
+  .chip{padding:3px 9px;border-radius:12px;background:#151b26;color:#5b7186;border:1px solid #1e2430;}
+  .chip.set{color:#0b0d11;font-weight:700;}
+  #toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);max-width:92%;
+    background:#152030;color:#cfe6ff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;
+    opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;border:1px solid #24405c;}
+  #toast.show{opacity:1;}
+  #preview{position:fixed;inset:0;background:rgba(4,7,12,.92);display:none;z-index:40;
+    flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;}
+  #preview.show{display:flex;}
+  #preview img{max-width:96%;border-radius:8px;border:1px solid #24405c;}
+  #preview .cap{font-size:13px;color:#9fb4c8;text-align:center;line-height:1.6;}
+  #preview .row{display:flex;gap:10px;}
+</style>
+</head>
+<body>
+<div class="top">
+  <a href="index.html" aria-label="back">‹</a>
+  <h1>📐 Court Calibration</h1>
+  <span class="pill" id="statePill">connecting…</span>
+</div>
+<div id="instruct">Loading camera frame…</div>
+<div id="stage">
+  <canvas id="cv"></canvas>
+  <div id="zoomLbl">1.0×</div>
+  <div id="waiting">waiting for camera…</div>
+</div>
+<div class="bar">
+  <button class="btn primary" id="btnLive"  onclick="C.toggleLive()">⏸ Freeze</button>
+  <button class="btn zoom" onclick="C.zoomBtn(1)">＋</button>
+  <button class="btn zoom" onclick="C.zoomBtn(-1)">－</button>
+  <button class="btn zoom" onclick="C.zoomReset()">1:1</button>
+  <button class="btn" onclick="C.undo()">↩ Undo</button>
+  <button class="btn" onclick="C.resetPts()">Reset</button>
+  <button class="btn good" id="btnSubmit" disabled onclick="C.submit()">✓ Save (0/4)</button>
+  <button class="btn danger" onclick="C.clearSaved()">🗑 Clear saved</button>
+</div>
+<div id="chips"></div>
+<div id="toast"></div>
+
+<div id="preview">
+  <img id="prevImg" alt="bird's-eye preview">
+  <div class="cap">Bird's-eye preview — the court should look like a clean
+    <b>rectangle</b> with straight lines.<br>If it looks skewed, close and re-click the corners.</div>
+  <div class="row">
+    <button class="btn primary" onclick="C.closePreview()">Done</button>
+    <button class="btn" onclick="C.closePreview(); C.resetPts();">Re-do corners</button>
+  </div>
+</div>
+
+<script>
+const C = (() => {
+  const base = localStorage.getItem('srv') || '';
+  const api  = p => base + p;
+  const $    = id => document.getElementById(id);
+
+  const NAMES  = ['Top-Left', 'Top-Right', 'Bottom-Right', 'Bottom-Left'];
+  const LABELS = ['TL', 'TR', 'BR', 'BL'];
+  const COLORS = ['#00e578', '#38b6ff', '#ffb020', '#ff5c72'];
+  const MAXZ   = 12;
+
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  let img = null, imgW = 1280, imgH = 720;      // current frame (Image)
+  let corners = [];                              // [[x,y]] image px
+  let z = 1, ox = 0, oy = 0;                     // zoom + pan (image space)
+  let live = true, pollTimer = null, fetching = false;
+
+  // ── layout ───────────────────────────────────────────────────────────────
+  function fit() {
+    const stage = $('stage');
+    const availH = window.innerHeight - stage.offsetTop - 118;
+    const arW = window.innerWidth, arH = arW * (imgH / imgW);
+    const h = Math.min(Math.max(arH, 180), Math.max(availH, 220));
+    stage.style.height = h + 'px';
+    const dpr = window.devicePixelRatio || 1;
+    cv.width  = Math.round(stage.clientWidth  * dpr);
+    cv.height = Math.round(stage.clientHeight * dpr);
+    draw();
+  }
+  window.addEventListener('resize', fit);
+
+  // ── view transform: image px → canvas px ────────────────────────────────
+  // sBase letterboxes the full image; z zooms on top of it.
+  function sBase() { return Math.min(cv.width / imgW, cv.height / imgH); }
+  function pad()   { const s = sBase();
+    return { x: (cv.width - imgW * s * 0) / 1, y: 0 }; } // (kept simple: top-left anchor)
+  function toCanvas(px, py) { const s = sBase() * z;
+    return [(px - ox) * s, (py - oy) * s]; }
+  function toImage(cx, cy)  { const s = sBase() * z;
+    return [cx / s + ox, cy / s + oy]; }
+  function clampView() {
+    const s = sBase() * z;
+    const vw = cv.width / s, vh = cv.height / s;
+    ox = Math.min(Math.max(ox, 0), Math.max(0, imgW - vw));
+    oy = Math.min(Math.max(oy, 0), Math.max(0, imgH - vh));
+    if (z <= 1) { ox = 0; oy = 0; }
+  }
+
+  // ── drawing ──────────────────────────────────────────────────────────────
+  function draw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    if (!img) return;
+    const s = sBase() * z;
+    ctx.setTransform(s, 0, 0, s, -ox * s, -oy * s);
+    ctx.imageSmoothingEnabled = z * sBase() < 3;
+    ctx.drawImage(img, 0, 0, imgW, imgH);
+
+    // polygon
+    if (corners.length >= 2) {
+      ctx.strokeStyle = 'rgba(56,214,255,.85)';
+      ctx.lineWidth = 2 / s; ctx.setLineDash([10 / s, 6 / s]);
+      ctx.beginPath(); ctx.moveTo(corners[0][0], corners[0][1]);
+      for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i][0], corners[i][1]);
+      if (corners.length === 4) ctx.closePath();
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    // corner markers (constant screen size regardless of zoom)
+    corners.forEach((pt, i) => {
+      const r = 12 / s, col = COLORS[i];
+      ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 4 / s;
+      ctx.beginPath(); ctx.moveTo(pt[0] - r, pt[1]); ctx.lineTo(pt[0] + r, pt[1]);
+      ctx.moveTo(pt[0], pt[1] - r); ctx.lineTo(pt[0], pt[1] + r); ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = 1.6 / s;
+      ctx.beginPath(); ctx.moveTo(pt[0] - r, pt[1]); ctx.lineTo(pt[0] + r, pt[1]);
+      ctx.moveTo(pt[0], pt[1] - r); ctx.lineTo(pt[0], pt[1] + r); ctx.stroke();
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], 3 / s, 0, Math.PI * 2); ctx.fill();
+      ctx.font = `bold ${13 / s}px system-ui`; ctx.fillStyle = 'rgba(0,0,0,.8)';
+      ctx.fillText(LABELS[i], pt[0] + 15 / s + 1 / s, pt[1] - 8 / s + 1 / s);
+      ctx.fillStyle = col;
+      ctx.fillText(LABELS[i], pt[0] + 15 / s, pt[1] - 8 / s);
+    });
+    $('zoomLbl').textContent = z.toFixed(1) + '×';
+  }
+
+  // ── UI state ─────────────────────────────────────────────────────────────
+  function updateUI() {
+    const n = corners.length;
+    if (n < 4) {
+      $('instruct').innerHTML =
+        `Tap corner <b>${n + 1}/4</b> — <b style="color:${COLORS[n]}">${NAMES[n]}</b>` +
+        ` &nbsp;·&nbsp; pinch / wheel = zoom, drag = pan`;
+      $('instruct').style.color = COLORS[n];
+    } else {
+      $('instruct').innerHTML = `All 4 corners set — press <b style="color:#00e578">✓ Save</b>`;
+      $('instruct').style.color = '#00e578';
+    }
+    $('btnSubmit').textContent = n === 4 ? '✓ Save calibration' : `✓ Save (${n}/4)`;
+    $('btnSubmit').disabled = n !== 4;
+    $('chips').innerHTML = LABELS.map((l, i) => {
+      const c = corners[i];
+      return c ? `<span class="chip set" style="background:${COLORS[i]}">${l} ${Math.round(c[0])},${Math.round(c[1])}</span>`
+               : `<span class="chip">${l} —</span>`;
+    }).join('');
+  }
+  function pill(txt, cls) { const p = $('statePill'); p.textContent = txt; p.className = 'pill ' + (cls || ''); }
+  let toastT = null;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+  // ── live view: MJPEG stream drawn on the canvas every frame ─────────────
+  const mj = new Image();          // hidden MJPEG sink — browser keeps decoding
+  let raf = null;
+  function liveLoop() {
+    if (!live) return;
+    if (mj.naturalWidth) {
+      img = mj;
+      if (imgW !== mj.naturalWidth || imgH !== mj.naturalHeight) {
+        imgW = mj.naturalWidth; imgH = mj.naturalHeight; fit();
+      }
+      $('waiting').style.display = 'none';
+      draw();
+    }
+    raf = requestAnimationFrame(liveLoop);
+  }
+  function startLive() {
+    live = true; $('btnLive').textContent = '⏸ Freeze'; pill('LIVE', 'live');
+    mj.src = api('/calib/stream') + '?t=' + Date.now();
+    raf = requestAnimationFrame(liveLoop);
+  }
+  async function stopLive() {
+    live = false; cancelAnimationFrame(raf); raf = null;
+    $('btnLive').textContent = '▶ Live'; pill('FROZEN', 'frozen');
+    mj.src = '';                   // close the MJPEG connection
+    // Fetch the exact full-quality frozen frame (also cached server-side for
+    // the bird's-eye preview after saving).
+    try {
+      const d = await (await fetch(api('/calib/frame'), { cache: 'no-store' })).json();
+      if (d.ok) {
+        const im = new Image();
+        im.onload = () => { img = im; imgW = d.w; imgH = d.h; draw(); };
+        im.src = 'data:image/jpeg;base64,' + d.frame_b64;
+      }
+    } catch (e) { /* keep last streamed frame on screen */ }
+  }
+
+  // ── pointer interaction: tap=corner, drag=pan, pinch/wheel=zoom ─────────
+  const ptrs = new Map();
+  let tapStart = null, pinch0 = null, moved = false;
+
+  function canvasXY(e) {
+    const r = cv.getBoundingClientRect();
+    return [(e.clientX - r.left) * (cv.width / r.width),
+            (e.clientY - r.top) * (cv.height / r.height)];
+  }
+  cv.addEventListener('pointerdown', e => {
+    cv.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, canvasXY(e));
+    if (ptrs.size === 1) { tapStart = canvasXY(e); moved = false; }
+    if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      pinch0 = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z,
+                 mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] };
+    }
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!ptrs.has(e.pointerId)) return;
+    const cur = canvasXY(e), prev = ptrs.get(e.pointerId);
+    ptrs.set(e.pointerId, cur);
+    if (ptrs.size === 1) {
+      const dx = cur[0] - prev[0], dy = cur[1] - prev[1];
+      if (tapStart && Math.hypot(cur[0] - tapStart[0], cur[1] - tapStart[1]) > 12) moved = true;
+      if (moved) { const s = sBase() * z; ox -= dx / s; oy -= dy / s; clampView(); draw(); }
+    } else if (ptrs.size === 2 && pinch0) {
+      const [a, b] = [...ptrs.values()];
+      const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const [mix, miy] = toImage(pinch0.mid[0], pinch0.mid[1]);
+      z = Math.min(MAXZ, Math.max(1, pinch0.z * (d / pinch0.d)));
+      const s = sBase() * z;
+      ox = mix - mid[0] / s; oy = miy - mid[1] / s;
+      clampView(); draw();
+    }
+  });
+  function ptrUp(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (ptrs.size < 2) pinch0 = null;
+    if (ptrs.size === 0 && tapStart && !moved && img && corners.length < 4) {
+      const [ix, iy] = toImage(tapStart[0], tapStart[1]);
+      if (ix >= 0 && iy >= 0 && ix <= imgW && iy <= imgH) {
+        corners.push([ix, iy]);
+        if (live) { stopLive(); toast('Frame frozen — finish the 4 corners'); }
+        updateUI(); draw();
+        if (navigator.vibrate) navigator.vibrate(15);
+      }
+    }
+    tapStart = null;
+  }
+  cv.addEventListener('pointerup', ptrUp);
+  cv.addEventListener('pointercancel', ptrUp);
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const [cx, cy] = canvasXY(e);
+    const [ix, iy] = toImage(cx, cy);
+    z = Math.min(MAXZ, Math.max(1, z * (e.deltaY < 0 ? 1.2 : 1 / 1.2)));
+    const s = sBase() * z;
+    ox = ix - cx / s; oy = iy - cy / s;
+    clampView(); draw();
+  }, { passive: false });
+
+  // ── actions ──────────────────────────────────────────────────────────────
+  async function submit() {
+    if (corners.length !== 4) return;
+    toast('Saving calibration…');
+    try {
+      const r = await fetch(api('/calib/corners'), {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ corners: corners.map(c => [Math.round(c[0] * 10) / 10, Math.round(c[1] * 10) / 10]) })
+      });
+      const d = await r.json();
+      if (!d.ok) { toast('✗ ' + (d.error || 'failed')); return; }
+      toast('✓ Calibration saved & applied live');
+      if (d.preview_b64) {
+        $('prevImg').src = 'data:image/jpeg;base64,' + d.preview_b64;
+        $('preview').classList.add('show');
+      }
+    } catch (e) { toast('✗ server unreachable'); }
+  }
+  async function clearSaved() {
+    try {
+      await fetch(api('/calib/clear'), { method: 'POST' });
+      corners = []; updateUI(); draw(); toast('Saved calibration cleared');
+    } catch (e) { toast('✗ server unreachable'); }
+  }
+
+  // ── boot ─────────────────────────────────────────────────────────────────
+  fit(); updateUI(); startLive();
+
+  return {
+    toggleLive: () => live ? stopLive() : startLive(),
+    zoomBtn: dir => { const cx = cv.width / 2, cy = cv.height / 2;
+      const [ix, iy] = toImage(cx, cy);
+      z = Math.min(MAXZ, Math.max(1, z * (dir > 0 ? 1.35 : 1 / 1.35)));
+      const s = sBase() * z; ox = ix - cx / s; oy = iy - cy / s;
+      clampView(); draw(); },
+    zoomReset: () => { z = 1; ox = oy = 0; draw(); },
+    undo: () => { corners.pop(); updateUI(); draw(); },
+    resetPts: () => { corners = []; updateUI(); draw(); },
+    submit, clearSaved,
+    closePreview: () => $('preview').classList.remove('show'),
+  };
+})();
+</script>
+</body>
+</html>
