@@ -1,11 +1,11 @@
 # Handball AI Analysis System — Technical Specification
 
-**Version:** 1.0  
-**Sport:** Handball  
-**Owner:** Goalkeeper Coach  
-**Target Hardware:** Dell Precision 7740 · Core i9 · 32GB RAM · Quadro RTX 3000 Mobile (6GB VRAM)  
-**Camera:** Hikvision DS-2CD2686G2-LZS · 8MP · Varifocal 2.8–12mm · RTSP  
-**Constraint:** 100% Offline — local hotspot only, no cloud, no internet during match  
+**Version:** 1.0
+**Sport:** Handball
+**Owner:** Goalkeeper Coach
+**Target Hardware:** Dell Precision 7740 · Core i9 · 32GB RAM · Quadro RTX 3000 Mobile (6GB VRAM)
+**Camera:** Hikvision DS-2CD2686G2-LZS · 8MP · Varifocal 2.8–12mm · RTSP
+**Constraint:** 100% Offline — local hotspot only, no cloud, no internet during match
 
 ---
 
@@ -22,7 +22,7 @@
 
 ```
 handball-system/
-├── Phase 1  Manual Tagger (MVP)            ← DONE ✓
+├── Phase 1  Manual Tagger (MVP)            ← DONE
 ├── Phase 2  Live AI Detection              ← next
 ├── Phase 3  Court Analysis + GK Module    ← after 2
 └── Phase 4  Dashboard + Reports + Notify  ← last
@@ -30,7 +30,7 @@ handball-system/
 
 ---
 
-## Phase 1 — Manual Tagger (MVP) ✅
+## Phase 1 — Manual Tagger (MVP)
 
 **Goal:** Working tool today. Coach tags events by hotkey while watching recorded match. Auto-clips around each tag.
 
@@ -75,7 +75,7 @@ python src\main.py
 
 ## Phase 2 — Live AI Detection
 
-**Goal:** Real-time RTSP stream with player + ball detection, team color split, player tracking.  
+**Goal:** Real-time RTSP stream with player + ball detection, team color split, player tracking.
 **Approach:** AI suggests detections → coach confirms/corrects (semi-automatic).
 
 **Stack additions:**
@@ -121,7 +121,7 @@ BLUE_LOW  = (100, 80, 60)
 BLUE_HIGH = (130, 255, 255)
 ```
 
-**Performance target:** 25fps live on RTX 3000 · YOLOv8m · 1080p  
+**Performance target:** 25fps live on RTX 3000 · YOLOv8m · 1080p
 **Optional speedup:** Export to TensorRT `.engine` → ~2× inference, ~15fps headroom left
 
 **New files:**
@@ -141,7 +141,7 @@ src/pipeline.py   orchestrate capture→detect→track→color
 
 ### 3a — Court Homography
 
-**How:** Coach clicks 4 known court corners once at setup. System computes homography matrix H.  
+**How:** Coach clicks 4 known court corners once at setup. System computes homography matrix H.
 **Output:** Every tracked player/ball gets `(x_m, y_m)` in court meters (court = 40m × 20m for handball).
 
 **Court zones (handball):**
@@ -327,10 +327,10 @@ Camera
 
 | Phase | Duration | Deliverable |
 |-------|----------|-------------|
-| 1 | Done ✅ | Manual tagger + clip export |
+| 1 | Done | Manual tagger + clip export |
 | 2 | 3–4 weeks | Live AI detection preview window |
 | 3 | 4–6 weeks | Court zones + events + GK stats |
 | 4 | 3–4 weeks | Dashboard + PDF report + phone notify |
 
-**Total estimate:** ~3 months to full system  
+**Total estimate:** ~3 months to full system
 **Sellable after:** Phase 3 complete (GK analysis = unique commercial value)

@@ -158,5 +158,5 @@ if __name__ == "__main__":
     print(f"Local IP {local_ip()}  subnet {subnet_base()}.0/24")
     print("Scanning… (RTSP 554)")
     for c in discover(u, p, progress=lambda d, t: None):
-        tag = f"  ✓ {c['url']}  ({c['w']}x{c['h']})" if c["url"] else "  (no RTSP variant verified)"
+        tag = f"  {c['url']}  ({c['w']}x{c['h']})" if c["url"] else "  (no RTSP variant verified)"
         print(f"{c['ip']:16s} ports={c['ports']}{tag}")

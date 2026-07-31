@@ -696,5 +696,4 @@ reports/report_fulltime_<timestamp>.pdf
 Internal project — لا توزيع.
 
 ## المساهمون
-- Omar Essam Salah — owner / coach / vision
-- Claude (AI engineering pair) — implementation + debugging
+- Omar Essam Salah — owner / vision / engineering

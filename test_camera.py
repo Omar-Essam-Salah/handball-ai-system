@@ -50,20 +50,20 @@ def check_env():
         import cv2
         build = cv2.getBuildInformation()
         ffmpeg_ok = "FFMPEG:                      YES" in build or "GStreamer" in build
-        print(f"  OpenCV : {cv2.__version__}  ✓  (FFMPEG backend: {'YES' if ffmpeg_ok else 'check build'})")
+        print(f"  OpenCV : {cv2.__version__}   (FFMPEG backend: {'YES' if ffmpeg_ok else 'check build'})")
         results["cv2"] = cv2
     except ImportError:
-        print("  OpenCV : NOT INSTALLED  ✗")
+        print("  OpenCV : NOT INSTALLED  ")
         print("           → pip install opencv-python")
         results["cv2"] = None
 
     # NumPy
     try:
         import numpy as np
-        print(f"  NumPy  : {np.__version__}  ✓")
+        print(f"  NumPy  : {np.__version__}  ")
         results["np"] = np
     except ImportError:
-        print("  NumPy  : NOT INSTALLED  ✗  → pip install numpy")
+        print("  NumPy  : NOT INSTALLED   → pip install numpy")
         results["np"] = None
 
     # PyTorch / CUDA
@@ -73,9 +73,9 @@ def check_env():
         if cuda_ok:
             gpu  = torch.cuda.get_device_name(0)
             vram = torch.cuda.get_device_properties(0).total_memory / 1024**3
-            print(f"  PyTorch: {torch.__version__}  ✓")
-            print(f"  CUDA   : {torch.version.cuda}  ✓")
-            print(f"  GPU    : {gpu}  ({vram:.1f} GB VRAM)  ✓")
+            print(f"  PyTorch: {torch.__version__}  ")
+            print(f"  CUDA   : {torch.version.cuda}  ")
+            print(f"  GPU    : {gpu}  ({vram:.1f} GB VRAM)  ")
         else:
             print(f"  PyTorch: {torch.__version__}  (CUDA NOT available — CPU only)")
         results["torch"] = torch
@@ -90,10 +90,10 @@ def check_env():
         out = subprocess.run(["ffmpeg", "-version"],
                              capture_output=True, text=True, timeout=5)
         line = out.stdout.splitlines()[0].split("Copyright")[0].strip()
-        print(f"  FFmpeg : {line}  ✓")
+        print(f"  FFmpeg : {line}  ")
         results["ffmpeg"] = True
     except (FileNotFoundError, subprocess.TimeoutExpired):
-        print("  FFmpeg : NOT FOUND in PATH  ✗  → install ffmpeg and add to PATH")
+        print("  FFmpeg : NOT FOUND in PATH   → install ffmpeg and add to PATH")
         results["ffmpeg"] = False
 
     print()
@@ -108,10 +108,10 @@ def check_port(ip, port, label, timeout=2.0):
     try:
         s = socket.create_connection((ip, port), timeout=timeout)
         s.close()
-        print(f"  ✓  {label:20s} {ip}:{port}  OPEN")
+        print(f"   {label:20s} {ip}:{port}  OPEN")
         return True
     except (ConnectionRefusedError, OSError):
-        print(f"  ✗  {label:20s} {ip}:{port}  closed / unreachable")
+        print(f"   {label:20s} {ip}:{port}  closed / unreachable")
         return False
 
 def ping_camera(ip):
@@ -125,16 +125,16 @@ def ping_camera(ip):
             # Extract avg round-trip time
             for line in result.stdout.splitlines():
                 if "Average" in line or "average" in line or "Moyenne" in line:
-                    print(f"  ✓  Host reachable  ({line.strip()})")
+                    print(f"   Host reachable  ({line.strip()})")
                     break
             else:
-                print(f"  ✓  Host reachable")
+                print(f"   Host reachable")
             return True
         else:
-            print(f"  ✗  No reply — check network / hotspot")
+            print(f"   No reply — check network / hotspot")
             return False
     except subprocess.TimeoutExpired:
-        print(f"  ✗  Ping timed out")
+        print(f"   Ping timed out")
         return False
 
 def full_network_check(ip):
@@ -160,7 +160,7 @@ def full_network_check(ip):
         print(f"  → Open camera web UI:  http://{ip}:{DEFAULT_HTTP}")
         print(f"    Verify: Video→Encoding→Sub-stream = H.264, 1080p, 25fps, 4-6Mbps")
     if not rtsp_open:
-        print(f"  ⚠  RTSP port 554 closed — the stream test will fail.")
+        print(f"   RTSP port 554 closed — the stream test will fail.")
         print(f"     Check camera firewall / RTSP service in the web UI.")
 
     return reachable, rtsp_open
@@ -200,7 +200,7 @@ def test_stream(url, duration_s=15):
     cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
 
     if not cap.isOpened():
-        print("  ✗  Failed to open stream.")
+        print("   Failed to open stream.")
         print()
         print("  Troubleshoot:")
         print("  1. Wrong password?  → open http://172.16.5.174 in browser and confirm login")
@@ -217,7 +217,7 @@ def test_stream(url, duration_s=15):
     height   = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps_prop = cap.get(cv2.CAP_PROP_FPS)
 
-    print(f"  ✓  Stream opened")
+    print(f"   Stream opened")
     print(f"     Resolution : {width}×{height}")
     print(f"     FPS (prop) : {fps_prop:.1f}")
     print()
@@ -232,7 +232,7 @@ def test_stream(url, duration_s=15):
         if not ret:
             drop_count += 1
             if drop_count > 10:
-                print("  ✗  Too many dropped frames — stream lost")
+                print("   Too many dropped frames — stream lost")
                 break
             continue
 
@@ -273,11 +273,11 @@ def test_stream(url, duration_s=15):
     print(f"  Avg FPS  : {avg_fps:.1f}")
 
     if avg_fps >= 23:
-        verdict = "✓  GOOD"
+        verdict = " GOOD"
     elif avg_fps >= 15:
-        verdict = "⚠  ACCEPTABLE (check bitrate / network load)"
+        verdict = " ACCEPTABLE (check bitrate / network load)"
     else:
-        verdict = "✗  POOR — reduce resolution or check H.265→H.264"
+        verdict = " POOR — reduce resolution or check H.265→H.264"
 
     print(f"  Verdict  : {verdict}")
     return True

@@ -130,7 +130,7 @@ const App = (() => {
     // playback sync (don't fight the user mid-interaction)
     const c = s.controls || {};
     if (document.activeElement !== $('seekBar')) {
-      paused = !!c.paused; $('pbPlay').textContent = paused ? '▶' : '⏸';
+      paused = !!c.paused; $('pbPlay').textContent = paused ? '▶' : '';
       document.querySelectorAll('#speeds button').forEach(b =>
         b.classList.toggle('on', parseFloat(b.dataset.spd) === parseFloat(c.speed || 1)));
     }
@@ -163,7 +163,7 @@ const App = (() => {
         const col = {GOAL:'#3fe07a', SAVE:'#36b6ff', MISS:'#ffb648', PASS:'#9aa0aa'}[av.outcome] || '#9aa0aa';
         ave.style.display = 'block';
         ave.style.borderColor = col;
-        ave.innerHTML = `🧠 <b style="color:${col}">AI: ${av.outcome}</b> ` +
+        ave.innerHTML = `<b style="color:${col}">AI: ${av.outcome}</b> ` +
           `<span class="muted">${Math.round((av.confidence||0)*100)}%</span> ` +
           `<span class="muted">· ${esc(av.reason||'')}</span>`;
       } else { ave.style.display = 'none'; }
@@ -372,7 +372,7 @@ const App = (() => {
       const r = await (await fetch(api('/scan'))).json();
       $('scanResults').innerHTML = (r.cameras || []).map(c =>
         `<div class="cam" onclick="App.pick('${c.url}')">${c.ip}
-          ${c.w ? '· ' + c.w + '×' + c.h + ' ✓' : '· tap to try'}</div>`
+          ${c.w ? '· ' + c.w + '×' + c.h + ' ' : '· tap to try'}</div>`
       ).join('') || `<div class="cam">No RTSP cameras on ${r.subnet}.0/24</div>`;
     } catch (e) { $('scanResults').innerHTML = '<div class="cam">scan failed</div>'; }
   }
@@ -385,7 +385,7 @@ const App = (() => {
   let paused = false, seekTimer = null;
   function togglePause() {
     paused = !paused;
-    $('pbPlay').textContent = paused ? '▶' : '⏸';
+    $('pbPlay').textContent = paused ? '▶' : '';
     sendControl({paused});
   }
   function step() {

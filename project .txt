@@ -1,17 +1,17 @@
-My friend… this is not just an app anymore — this is a **full AI performance analysis system** 🔥
+My friend… this is not just an app anymore — this is a **full AI performance analysis system**
 What you’re describing is actually close to what top professional clubs use, and even they struggle to get it fully automated.
 
 I’ll be honest with you (as always):
-👉 **What you want is possible — but not all at once, and not easily.**
+**What you want is possible — but not all at once, and not easily.**
 We need to break it into smart phases so your programmer can actually build it.
 
 ---
 
-# 🧠 Let’s translate your idea into a real system
+# Let’s translate your idea into a real system
 
 You want 4 major AI capabilities:
 
-## 1) 🎥 Automatic Video Recording & Detection
+## 1) Automatic Video Recording & Detection
 
 * Auto-detect when a match starts
 * Track players + ball in real-time
@@ -23,14 +23,14 @@ You want 4 major AI capabilities:
   * Turnovers
   * Counter-attacks
 
-👉 This requires:
+This requires:
 
 * Computer Vision (like YOLO / OpenCV)
 * Player tracking system (multi-object tracking)
 
 ---
 
-## 2) ✂️ Automatic Event Clipping
+## 2) Automatic Event Clipping
 
 * AI cuts clips automatically:
 
@@ -39,11 +39,11 @@ You want 4 major AI capabilities:
   * Each shot
 * Timeline divided into “possessions”
 
-👉 This is doable and should be **Phase 1 priority**
+This is doable and should be **Phase 1 priority**
 
 ---
 
-## 3) 🧩 Deep Tactical Analysis (Your Coaching Brain 🧠)
+## 3) Deep Tactical Analysis (Your Coaching Brain )
 
 This is the most powerful part:
 
@@ -65,7 +65,7 @@ This is the most powerful part:
 * Inaccurate passes
 * Transition responsibility (last 2 players)
 
-👉 This requires:
+This requires:
 
 * Event classification AI
 * Spatial analysis (court zones)
@@ -73,7 +73,7 @@ This is the most powerful part:
 
 ---
 
-## 4) 📊 Auto Reports + Notifications
+## 4) Auto Reports + Notifications
 
 * After each match (or even live):
 
@@ -83,14 +83,14 @@ This is the most powerful part:
 
 * Notifications:
 
-  * 📱 Phone
-  * ⌚ Smartwatch
+  * Phone
+  * Smartwatch
 
-👉 This part is actually **easy compared to AI tracking**
+This part is actually **easy compared to AI tracking**
 
 ---
 
-# ⚠️ Reality Check (Important)
+# Reality Check (Important)
 
 Fully automatic without human input = **VERY advanced**
 
@@ -99,15 +99,15 @@ Even pro systems still:
 * Require manual correction
 * Or semi-automatic tagging
 
-👉 So the smart approach is:
+So the smart approach is:
 
 ### Start with “Semi-AI” → then evolve to “Full AI”
 
 ---
 
-# 🚀 Recommended Development Plan (VERY IMPORTANT)
+# Recommended Development Plan (VERY IMPORTANT)
 
-## 🟢 Phase 1 (MVP – 2 to 3 months)
+## Phase 1 (MVP – 2 to 3 months)
 
 Focus on:
 
@@ -116,11 +116,11 @@ Focus on:
 * Drawing tools
 * Auto clip generation
 
-👉 This gives you a working product FAST
+This gives you a working product FAST
 
 ---
 
-## 🟡 Phase 2 (AI Assistance)
+## Phase 2 (AI Assistance)
 
 * Auto-detect:
 
@@ -128,11 +128,11 @@ Focus on:
   * Players
 * Suggest events (coach confirms)
 
-👉 “AI helps you” instead of replacing you
+“AI helps you” instead of replacing you
 
 ---
 
-## 🔴 Phase 3 (Full Automation – Your Dream)
+## Phase 3 (Full Automation – Your Dream)
 
 * Auto detect everything
 * Auto generate reports
@@ -141,11 +141,11 @@ Focus on:
 
 ---
 
-# 🧠 Key Advice for Your Programmer
+# Key Advice for Your Programmer
 
 Tell him clearly:
 
-👉 “We are NOT building everything at once.”
+“We are NOT building everything at once.”
 
 Instead, define modules:
 
@@ -158,11 +158,11 @@ Instead, define modules:
 
 ---
 
-# 💡 The SECRET Advantage (YOU)
+# The SECRET Advantage (YOU)
 
 This is why your project can succeed:
 
-👉 You are a **goalkeeper coach**
+You are a **goalkeeper coach**
 
 So you can:
 
@@ -172,24 +172,24 @@ So you can:
   * “What is a weak save zone?”
   * “What counts as a failed attack?”
 
-👉 AI needs this knowledge — and YOU have it.
+AI needs this knowledge — and YOU have it.
 
 ---
 
-# 🔥 My Honest Opinion
+# My Honest Opinion
 
 Your idea is:
 
-* Not a small app ❌
-* It’s a **startup-level product** ✅
+* Not a small app
+* It’s a **startup-level product**
 
 But:
-👉 If built step-by-step → it can become VERY powerful
-👉 And even something you could sell to clubs later
+If built step-by-step → it can become VERY powerful
+And even something you could sell to clubs later
 
 ---
 
-# 👉 Next Step
+# Next Step
 
 If you want, I can help you:
 
@@ -199,8 +199,8 @@ If you want, I can help you:
 
 Just tell me:
 
-👉 “Let’s build the plan”
+“Let’s build the plan”
 or
-👉 “Start with UI design”
+“Start with UI design”
 
-And we go step by step, my friend 💪
+And we go step by step, my friend 

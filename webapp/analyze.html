@@ -67,8 +67,8 @@
   .stat .v{font-size:17px;font-weight:800;color:#00b4ff;}
   .stat .k{font-size:10px;color:#8ea3b8;margin-top:2px;}
   .pill-list{font-size:13px;line-height:2;}
-  .pill-list .good::before{content:"✓ ";color:#00e578;}
-  .pill-list .bad::before{content:"⚠ ";color:#ff8fa0;}
+  .pill-list .good::before{content:"";color:#00e578;}
+  .pill-list .bad::before{content:"";color:#ff8fa0;}
 
   #newBtn{margin-top:10px;}
 </style>
@@ -76,13 +76,13 @@
 <body>
 <div class="top">
   <a href="index.html">‹</a>
-  <h1>📋 تحليل الهجمات</h1>
+  <h1>تحليل الهجمات</h1>
   <span style="width:20px"></span>
 </div>
 
 <main>
   <div id="uploadCard">
-    <div class="icon">🎥</div>
+    <div class="icon"></div>
     <h2>ارفع مقطع فيديو للمباراة</h2>
     <p>هيتم تحليل المقطع تلقائياً واستخراج كل لحظة حرجة (هدف / تصدي / تسديدة خارج المرمى)
       مع الرسم التكتيكي الكامل وتقرير عربي لكل هجمة، وفي النهاية تقرير نقاط القوة والضعف.</p>
@@ -93,14 +93,14 @@
     <div class="teams-row" style="margin-top:0">
       <select id="engine" style="flex:1;background:#0e1219;border:1px solid #24405c;
         border-radius:8px;color:#e8f0f7;padding:10px;font-size:13px;">
-        <option value="gemini" selected>⚡ Gemini — سريع وذكي (يستهلك حصة API)</option>
-        <option value="cv">🖥 تتبع محلي — دقيق بالبكسل وأبطأ (مجاني)</option>
+        <option value="gemini" selected>Gemini — سريع وذكي (يستهلك حصة API)</option>
+        <option value="cv">تتبع محلي — دقيق بالبكسل وأبطأ (مجاني)</option>
       </select>
     </div>
-    <label class="btn wide" for="videoFile">📁 اختر فيديو</label>
+    <label class="btn wide" for="videoFile">اختر فيديو</label>
     <input type="file" id="videoFile" accept="video/*">
     <div id="fname"></div>
-    <button class="btn wide" id="goBtn" style="margin-top:10px" disabled onclick="A.upload()">🚀 ابدأ التحليل</button>
+    <button class="btn wide" id="goBtn" style="margin-top:10px" disabled onclick="A.upload()">ابدأ التحليل</button>
   </div>
 
   <div id="progressCard">
@@ -112,9 +112,9 @@
   <div id="err"></div>
 
   <div id="results">
-    <h3 class="sub">📊 التقرير النهائي</h3>
+    <h3 class="sub">التقرير النهائي</h3>
     <div id="summaryBox"></div>
-    <h3 class="sub">🎯 اللحظات الحرجة</h3>
+    <h3 class="sub">اللحظات الحرجة</h3>
     <div id="momentsBox"></div>
     <button class="btn wide" id="newBtn" onclick="A.reset()">↺ تحليل فيديو جديد</button>
   </div>
@@ -134,7 +134,7 @@ const A = (() => {
   });
 
   function showErr(msg) {
-    const e = $('err'); e.textContent = '✗ ' + msg; e.classList.add('show');
+    const e = $('err'); e.textContent = '' + msg; e.classList.add('show');
   }
 
   async function upload() {
@@ -224,7 +224,7 @@ const A = (() => {
         <div class="body">
           <span class="tag ${m.event_type}">${TAG_AR[m.event_type] || m.event_type}</span>
           <div class="title">${r.attack_title}</div>
-          <div class="row">⏱ ${r.video_time_range} &nbsp;·&nbsp; النتيجة: ${r.score_at_execution}</div>
+          <div class="row">${r.video_time_range} &nbsp;·&nbsp; النتيجة: ${r.score_at_execution}</div>
           <div class="row"><b>الثغرة الدفاعية:</b> ${r.defensive_error}</div>
           <div class="row"><b>زاوية التسديد:</b> ${r.shooting_angle}</div>
           ${r.score_after ? `<div class="row">النتيجة بعد الهجمة: <b>${r.score_after}</b></div>` : ''}

@@ -1084,7 +1084,7 @@ if __name__ == "__main__":
 
     # Report
     if result.success:
-        print(f"\n✓ Calibration succeeded")
+        print(f"\nCalibration succeeded")
         print(f"  Reprojection error : {result.reproj_error_px:.2f} px")
         print(f"  Inliers            : {result.n_inliers}")
         print(f"  Features detected  : {', '.join(result.features_found)}")
@@ -1100,7 +1100,7 @@ if __name__ == "__main__":
             Path(args.save).write_text(json.dumps(out, indent=2))
             print(f"\n  Saved → {args.save}")
     else:
-        print(f"\n✗ Calibration failed")
+        print(f"\nCalibration failed")
         print(f"  Features found: {', '.join(result.features_found) or 'none'}")
 
     if args.debug and result.debug_frame is not None:

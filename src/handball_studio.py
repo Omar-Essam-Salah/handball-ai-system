@@ -203,7 +203,7 @@ class CameraDialog(QDialog):
         lay.addWidget(form)
 
         row = QHBoxLayout()
-        self.btn_scan = QPushButton("🔍  Scan network")
+        self.btn_scan = QPushButton(" Scan network")
         self.btn_scan.clicked.connect(self._start_scan)
         row.addWidget(self.btn_scan)
         self.bar = QProgressBar(); self.bar.setValue(0)
@@ -251,7 +251,7 @@ class CameraDialog(QDialog):
 
     def _on_found(self, entry: dict):
         if entry.get("url"):
-            label = f"✓  {entry['ip']}   {entry['w']}×{entry['h']}   (RTSP verified)"
+            label = f" {entry['ip']}   {entry['w']}×{entry['h']}   (RTSP verified)"
         else:
             label = f"•  {entry['ip']}   ports={entry['ports']}   (RTSP not verified — check credentials)"
         it = QListWidgetItem(label)
@@ -260,7 +260,7 @@ class CameraDialog(QDialog):
 
     def _scan_done(self):
         self.btn_scan.setEnabled(True)
-        self.btn_scan.setText("🔍  Scan network")
+        self.btn_scan.setText(" Scan network")
         if self.list.count() == 0:
             self.list.addItem("No cameras with open RTSP (554) found on this subnet.")
 
@@ -340,25 +340,25 @@ class MainWindow(QMainWindow):
 
         # top toolbar — WATCH
         tb = self.addToolBar("main"); tb.setMovable(False)
-        a_open = QAction("📂  Open Video", self); a_open.triggered.connect(self.open_video)
-        a_cam  = QAction("📡  Connect Camera", self); a_cam.triggered.connect(self.connect_camera)
-        a_stop = QAction("⏹  Stop", self); a_stop.triggered.connect(self.stop_pipeline)
+        a_open = QAction(" Open Video", self); a_open.triggered.connect(self.open_video)
+        a_cam  = QAction(" Connect Camera", self); a_cam.triggered.connect(self.connect_camera)
+        a_stop = QAction(" Stop", self); a_stop.triggered.connect(self.stop_pipeline)
         tb.addAction(a_open); tb.addAction(a_cam); tb.addSeparator(); tb.addAction(a_stop)
 
         # second toolbar — everything the old .bat files did, now buttons
         self.addToolBarBreak()
         tools = self.addToolBar("tools"); tools.setMovable(False)
-        a_phone = QAction("📱  Phone Mode", self); a_phone.setToolTip(
+        a_phone = QAction(" Phone Mode", self); a_phone.setToolTip(
             "Start the phone server so your phone can watch (Handball_Mobile.bat)")
         a_phone.triggered.connect(self.toggle_phone_mode)
-        a_label = QAction("🎯  Label Ball", self); a_label.setToolTip(
+        a_label = QAction(" Label Ball", self); a_label.setToolTip(
             "Mark correct ball positions to train the model (annotate_ball.py)")
         a_label.triggered.connect(self.launch_label)
-        a_train = QAction("🧠  Train Model", self); a_train.setToolTip(
+        a_train = QAction(" Train Model", self); a_train.setToolTip(
             "Retrain the ball model on your labels (train_ball.py)")
         a_train.triggered.connect(self.launch_train)
-        a_cal   = QAction("📐  Calibrate Court", self); a_cal.triggered.connect(self.launch_calibrate)
-        a_apk   = QAction("🔨  Build Phone App", self); a_apk.triggered.connect(self.launch_build_apk)
+        a_cal   = QAction(" Calibrate Court", self); a_cal.triggered.connect(self.launch_calibrate)
+        a_apk   = QAction(" Build Phone App", self); a_apk.triggered.connect(self.launch_build_apk)
         for a in (a_phone, a_label, a_train, a_cal, a_apk):
             tools.addAction(a)
         self._a_phone = a_phone
@@ -384,13 +384,13 @@ class MainWindow(QMainWindow):
 
         # row 2 — buttons + speed + go-to
         r2 = QHBoxLayout(); r2.setSpacing(6)
-        b_back = QPushButton("⏪ 10s"); b_back.setToolTip("Back 10 seconds")
+        b_back = QPushButton("10s"); b_back.setToolTip("Back 10 seconds")
         b_back.clicked.connect(lambda: self._seek_rel(-10))
-        self.tp_play = QPushButton("⏸ Pause"); self.tp_play.setObjectName("primary")
+        self.tp_play = QPushButton("Pause"); self.tp_play.setObjectName("primary")
         self.tp_play.clicked.connect(self._toggle_play)
-        b_fwd = QPushButton("10s ⏩"); b_fwd.setToolTip("Forward 10 seconds")
+        b_fwd = QPushButton("10s "); b_fwd.setToolTip("Forward 10 seconds")
         b_fwd.clicked.connect(lambda: self._seek_rel(+10))
-        b_step = QPushButton("⏭ Frame"); b_step.setToolTip("Advance one frame (pauses)")
+        b_step = QPushButton("Frame"); b_step.setToolTip("Advance one frame (pauses)")
         b_step.clicked.connect(self._step_frame)
         for b in (b_back, self.tp_play, b_fwd, b_step):
             r2.addWidget(b)
@@ -427,7 +427,7 @@ class MainWindow(QMainWindow):
         if not self._worker_running():
             return
         paused = self.worker.toggle_pause()
-        self.tp_play.setText("▶ Play" if paused else "⏸ Pause")
+        self.tp_play.setText("▶ Play" if paused else "Pause")
 
     def _set_speed(self, text: str):
         if self._worker_running():
@@ -624,7 +624,7 @@ class MainWindow(QMainWindow):
         self.tp_box.setEnabled(False)
         self.tp_slider.setValue(0)
         self.tp_time.setText("00:00 / 00:00")
-        self.tp_play.setText("⏸ Pause")
+        self.tp_play.setText("Pause")
         self.tp_speed.setCurrentText("1×")
         self.video.setText("Loading models…  (first start takes a few seconds)")
         self.statusBar().showMessage(f"Source: {source}")
@@ -666,7 +666,7 @@ class MainWindow(QMainWindow):
             try: self._phone_proc.terminate()
             except Exception: pass
             self._phone_proc = None
-            self._a_phone.setText("📱  Phone Mode")
+            self._a_phone.setText(" Phone Mode")
             self.statusBar().showMessage("Phone server stopped.", 5000)
             return
         # Embedded view and the server both use the GPU — stop the local view first
@@ -682,7 +682,7 @@ class MainWindow(QMainWindow):
             self._phone_proc = subprocess.Popen(
                 [self._pyexe, "src/mobile_server.py", "--source", "handball.mp4", "--port", "8000"],
                 cwd=str(ROOT), creationflags=flags)
-            self._a_phone.setText("📱  Phone: ON (click to stop)")
+            self._a_phone.setText(" Phone: ON (click to stop)")
             QMessageBox.information(self, "Phone Mode",
                 f"Phone server starting…\n\nOn your phone (same WiFi) open:\n"
                 f"    http://{ip}:8000\n\n"

@@ -60,7 +60,7 @@ def _bar(label: str, val, target, unit: str = "", width: int = 30) -> str:
         fill = 1.0
     blocks = int(fill * width)
     bar    = "█" * blocks + "░" * (width - blocks)
-    ok     = "✓" if fill >= 1.0 else "…"
+    ok     = "" if fill >= 1.0 else "…"
     return f"  {ok} {label:28s} [{bar}] {val:.1f}{unit} / {target}{unit}"
 
 
@@ -96,7 +96,7 @@ def run_test():
         if pkt is not None:
             break
     else:
-        print("  ✗  No frames received — check camera connection")
+        print("   No frames received — check camera connection")
         return
 
     h, w = pkt.frame.shape[:2]
@@ -312,7 +312,7 @@ def run_test():
     ]
     all_pass = True
     for label, ok in bools:
-        icon = "✓" if ok else "✗"
+        icon = "" if ok else ""
         print(f"  {icon} {label}")
         if not ok:
             all_pass = False
@@ -324,9 +324,9 @@ def run_test():
     print()
     if results["fps_avg"] >= TARGET_FPS and all_pass:
         results["passed"] = True
-        print("  ✓✓  ALL TESTS PASSED — system ready for real court")
+        print("   ALL TESTS PASSED — system ready for real court")
     else:
-        print("  ⚠   Some tests incomplete — see issues below:")
+        print("    Some tests incomplete — see issues below:")
         if results["fps_avg"] < TARGET_FPS:
             print(f"      • FPS too low ({results['fps_avg']:.1f}) →"
                   " use --model yolov8n.pt or reduce resolution")

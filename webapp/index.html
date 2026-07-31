@@ -16,7 +16,7 @@
 <!-- Connect overlay (shown until a server is reachable) -->
 <div id="connect" class="overlay">
   <div class="connect-card">
-    <div class="logo">🤾</div>
+    <div class="logo"></div>
     <h1>Handball Studio</h1>
     <p class="muted">Connecting to your match server…</p>
     <div class="spinner" id="connSpin"></div>
@@ -30,7 +30,7 @@
 <div id="loading" class="overlay hidden">
   <canvas id="loadCanvas"></canvas>
   <div class="load-center">
-    <div class="load-ring"><div class="load-core">🤾</div></div>
+    <div class="load-ring"><div class="load-core"></div></div>
     <div class="load-title">INITIALIZING&nbsp;AI&nbsp;ENGINE</div>
     <div class="load-bar"><i id="loadFill"></i></div>
     <div class="load-sub" id="loadSub">booting YOLOv8-pose · ball-net · trackers</div>
@@ -61,8 +61,8 @@
         <div class="vid-tag"><span id="fps">0</span> fps · <span id="ball">—</span></div>
       </div>
       <div class="playback">
-        <button class="pb-btn" id="pbPlay" onclick="App.togglePause()" title="Play/Pause">⏸</button>
-        <button class="pb-btn" id="pbStep" onclick="App.step()" title="Frame step">⏭</button>
+        <button class="pb-btn" id="pbPlay" onclick="App.togglePause()" title="Play/Pause"></button>
+        <button class="pb-btn" id="pbStep" onclick="App.step()" title="Frame step"></button>
         <input class="range seek" id="seekBar" type="range" min="0" max="1000" value="0"
                oninput="App.seek(this.value)">
         <div class="speeds" id="speeds">
@@ -180,11 +180,11 @@
       </div>
       <h3 class="sub">Tools (run on the PC)</h3>
       <div class="ctrl-grid">
-        <button class="ctrl" onclick="App.tool('label')"><b>🎯 Label Ball</b><span>mark positions</span></button>
-        <button class="ctrl" onclick="App.tool('train')"><b>🧠 Train Model</b><span>retrain ball</span></button>
-        <button class="ctrl" onclick="App.openCalib()"><b>📐 Calibrate</b><span>court corners — in browser</span></button>
-        <button class="ctrl" onclick="location.href='analyze.html'"><b>📋 Analyze Clip</b><span>upload video — full report</span></button>
-        <button class="ctrl" onclick="App.tool('build_apk')"><b>🔨 Build APK</b><span>phone app</span></button>
+        <button class="ctrl" onclick="App.tool('label')"><b>Label Ball</b><span>mark positions</span></button>
+        <button class="ctrl" onclick="App.tool('train')"><b>Train Model</b><span>retrain ball</span></button>
+        <button class="ctrl" onclick="App.openCalib()"><b>Calibrate</b><span>court corners — in browser</span></button>
+        <button class="ctrl" onclick="location.href='analyze.html'"><b>Analyze Clip</b><span>upload video — full report</span></button>
+        <button class="ctrl" onclick="App.tool('build_apk')"><b>Build APK</b><span>phone app</span></button>
       </div>
       <button class="btn ghost wide" id="installBtn" hidden onclick="App.install()">＋ Install app on home screen</button>
       <div class="muted small center" id="srvLbl"></div>
@@ -193,11 +193,11 @@
 
   <nav class="tabbar">
     <button class="tab on" data-page="match"     onclick="App.go('match')">▦<span>Match</span></button>
-    <button class="tab"    data-page="players"   onclick="App.go('players')">👥<span>Players</span></button>
-    <button class="tab"    data-page="technique" onclick="App.go('technique')">🦾<span>Tech</span></button>
-    <button class="tab"    data-page="tactics"   onclick="App.go('tactics')">🎯<span>Tactics</span></button>
-    <button class="tab"    data-page="reports"   onclick="App.go('reports'); App.loadReports()">📋<span>Reports</span></button>
-    <button class="tab"    data-page="controls"  onclick="App.go('controls')">⚙<span>Controls</span></button>
+    <button class="tab"    data-page="players"   onclick="App.go('players')"><span>Players</span></button>
+    <button class="tab"    data-page="technique" onclick="App.go('technique')"><span>Tech</span></button>
+    <button class="tab"    data-page="tactics"   onclick="App.go('tactics')"><span>Tactics</span></button>
+    <button class="tab"    data-page="reports"   onclick="App.go('reports'); App.loadReports()"><span>Reports</span></button>
+    <button class="tab"    data-page="controls"  onclick="App.go('controls')"><span>Controls</span></button>
   </nav>
 </div>
 

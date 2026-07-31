@@ -53,7 +53,7 @@
 <body>
 <div class="top">
   <a href="index.html" aria-label="back">‹</a>
-  <h1>📐 Court Calibration</h1>
+  <h1>Court Calibration</h1>
   <span class="pill" id="statePill">connecting…</span>
 </div>
 <div id="instruct">Loading camera frame…</div>
@@ -63,14 +63,14 @@
   <div id="waiting">waiting for camera…</div>
 </div>
 <div class="bar">
-  <button class="btn primary" id="btnLive"  onclick="C.toggleLive()">⏸ Freeze</button>
+  <button class="btn primary" id="btnLive"  onclick="C.toggleLive()">Freeze</button>
   <button class="btn zoom" onclick="C.zoomBtn(1)">＋</button>
   <button class="btn zoom" onclick="C.zoomBtn(-1)">－</button>
   <button class="btn zoom" onclick="C.zoomReset()">1:1</button>
   <button class="btn" onclick="C.undo()">↩ Undo</button>
   <button class="btn" onclick="C.resetPts()">Reset</button>
-  <button class="btn good" id="btnSubmit" disabled onclick="C.submit()">✓ Save (0/4)</button>
-  <button class="btn danger" onclick="C.clearSaved()">🗑 Clear saved</button>
+  <button class="btn good" id="btnSubmit" disabled onclick="C.submit()">Save (0/4)</button>
+  <button class="btn danger" onclick="C.clearSaved()">Clear saved</button>
 </div>
 <div id="chips"></div>
 <div id="toast"></div>
@@ -181,10 +181,10 @@ const C = (() => {
         ` &nbsp;·&nbsp; pinch / wheel = zoom, drag = pan`;
       $('instruct').style.color = COLORS[n];
     } else {
-      $('instruct').innerHTML = `All 4 corners set — press <b style="color:#00e578">✓ Save</b>`;
+      $('instruct').innerHTML = `All 4 corners set — press <b style="color:#00e578">Save</b>`;
       $('instruct').style.color = '#00e578';
     }
-    $('btnSubmit').textContent = n === 4 ? '✓ Save calibration' : `✓ Save (${n}/4)`;
+    $('btnSubmit').textContent = n === 4 ? 'Save calibration' : `Save (${n}/4)`;
     $('btnSubmit').disabled = n !== 4;
     $('chips').innerHTML = LABELS.map((l, i) => {
       const c = corners[i];
@@ -213,7 +213,7 @@ const C = (() => {
     raf = requestAnimationFrame(liveLoop);
   }
   function startLive() {
-    live = true; $('btnLive').textContent = '⏸ Freeze'; pill('LIVE', 'live');
+    live = true; $('btnLive').textContent = 'Freeze'; pill('LIVE', 'live');
     mj.src = api('/calib/stream') + '?t=' + Date.now();
     raf = requestAnimationFrame(liveLoop);
   }
@@ -308,19 +308,19 @@ const C = (() => {
         body: JSON.stringify({ corners: corners.map(c => [Math.round(c[0] * 10) / 10, Math.round(c[1] * 10) / 10]) })
       });
       const d = await r.json();
-      if (!d.ok) { toast('✗ ' + (d.error || 'failed')); return; }
-      toast('✓ Calibration saved & applied live');
+      if (!d.ok) { toast('' + (d.error || 'failed')); return; }
+      toast('Calibration saved & applied live');
       if (d.preview_b64) {
         $('prevImg').src = 'data:image/jpeg;base64,' + d.preview_b64;
         $('preview').classList.add('show');
       }
-    } catch (e) { toast('✗ server unreachable'); }
+    } catch (e) { toast('server unreachable'); }
   }
   async function clearSaved() {
     try {
       await fetch(api('/calib/clear'), { method: 'POST' });
       corners = []; updateUI(); draw(); toast('Saved calibration cleared');
-    } catch (e) { toast('✗ server unreachable'); }
+    } catch (e) { toast('server unreachable'); }
   }
 
   // ── boot ─────────────────────────────────────────────────────────────────

@@ -65,7 +65,7 @@ class TrainStudio(QMainWindow):
         g1 = QGroupBox("1) Pick a video to learn from"); v1 = QVBoxLayout(g1)
         row = QHBoxLayout()
         self.ed_video = QLineEdit(); self.ed_video.setPlaceholderText("no video chosen — click Open Video")
-        b_open = QPushButton("📂 Open Video"); b_open.clicked.connect(self.open_video)
+        b_open = QPushButton("Open Video"); b_open.clicked.connect(self.open_video)
         row.addWidget(self.ed_video, 1); row.addWidget(b_open); v1.addLayout(row)
         row2 = QHBoxLayout()
         row2.addWidget(QLabel("Arena/tag:"))
@@ -97,7 +97,7 @@ class TrainStudio(QMainWindow):
         self.sp_start.setSingleStep(5); self.sp_start.setToolTip(_start_lbl.toolTip())
         rowm.addWidget(self.sp_start)
         rowm.addStretch(1)
-        self.b_mine = QPushButton("⛏  Mine Hard Frames"); self.b_mine.setObjectName("go")
+        self.b_mine = QPushButton(" Mine Hard Frames"); self.b_mine.setObjectName("go")
         self.b_mine.clicked.connect(self.mine)
         rowm.addWidget(self.b_mine)
         v2.addLayout(rowm)
@@ -105,7 +105,7 @@ class TrainStudio(QMainWindow):
 
         # Step 3 — label
         g3 = QGroupBox("3) Label the ball (click the ball in the hardest views)"); v3 = QVBoxLayout(g3)
-        self.b_label = QPushButton("🎯  Label Selected Arena"); self.b_label.clicked.connect(self.label)
+        self.b_label = QPushButton(" Label Selected Arena"); self.b_label.clicked.connect(self.label)
         v3.addWidget(QLabel("Pick an arena on the right, then:"))
         v3.addWidget(self.b_label)
         left.addWidget(g3)
@@ -116,11 +116,11 @@ class TrainStudio(QMainWindow):
         rowt.addWidget(QLabel("Epochs:"))
         self.sp_ep = QSpinBox(); self.sp_ep.setRange(5, 200); self.sp_ep.setValue(30)
         rowt.addWidget(self.sp_ep); rowt.addStretch(1)
-        self.b_train = QPushButton("🧠  Train TrackNet"); self.b_train.setObjectName("go")
+        self.b_train = QPushButton(" Train TrackNet"); self.b_train.setObjectName("go")
         self.b_train.clicked.connect(self.train)
         rowt.addWidget(self.b_train)
         v4.addLayout(rowt)
-        self.b_stop = QPushButton("⏹ Stop current job"); self.b_stop.clicked.connect(self.stop)
+        self.b_stop = QPushButton("Stop current job"); self.b_stop.clicked.connect(self.stop)
         v4.addWidget(self.b_stop)
         left.addWidget(g4)
         left.addStretch(1)
@@ -242,7 +242,7 @@ class TrainStudio(QMainWindow):
         vdir = ROOT / "training" / "to_label" / v
         if not list(vdir.glob("*.jpg")):
             QMessageBox.information(self, "Mine first",
-                f"No frames for '{v}' yet.\n\nClick '⛏ Mine Hard Frames' first — that extracts "
+                f"No frames for '{v}' yet.\n\nClick 'Mine Hard Frames' first — that extracts "
                 f"the frames from your video. THEN you can label them."); return
         # the labeler opens its own OpenCV window; run it detached-ish via QProcess
         self._run([str(ROOT / "training" / "label_frames.py"),

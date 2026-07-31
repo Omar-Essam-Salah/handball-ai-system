@@ -117,13 +117,13 @@ def main():
     print(f"\n[6] Annotated frame written to: {out_path.resolve()}")
     print("\n=== SUMMARY ===")
     if not persons:
-        print("  ❌ Detector returned 0 persons — pose model is the problem.")
+        print("  Detector returned 0 persons — pose model is the problem.")
     elif not tracks_b:
-        print("  ❌ Detector found persons but BoT-SORT returned empty — tracker is the problem.")
+        print("  Detector found persons but BoT-SORT returned empty — tracker is the problem.")
     elif sum(1 for t in tracks_b if t.class_id==0) == 0:
-        print("  ❌ Tracker dropped all persons — investigate tracker exception path.")
+        print("  Tracker dropped all persons — investigate tracker exception path.")
     else:
-        print("  ✅ Pipeline stages all working — issue must be inside rules engine or visualization.")
+        print("  Pipeline stages all working — issue must be inside rules engine or visualization.")
     return 0
 
 if __name__ == "__main__":

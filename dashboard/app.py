@@ -22,7 +22,7 @@ WS_URL  = "ws://127.0.0.1:8765/ws"
 
 st.set_page_config(
     page_title="Handball AI Pro",
-    page_icon="🤾",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -70,11 +70,11 @@ def _logo_b64(uploaded_file) -> str | None:
     return "data:" + uploaded_file.type + ";base64," + _b64.b64encode(uploaded_file.read()).decode()
 
 _SEVERITY_CFG = {
-    "CRITICAL": ("critical", "#a855f7", "⚡"),
-    "DANGER":   ("danger",   "#ef4444", "🚨"),
-    "WARNING":  ("warning",  "#f59e0b", "⚠"),
-    "INFO":     ("info",     "#00e5ff", "💡"),
-    "TACTIC":   ("info",     "#00e5ff", "🎯"),
+    "CRITICAL": ("critical", "#a855f7", ""),
+    "DANGER":   ("danger",   "#ef4444", ""),
+    "WARNING":  ("warning",  "#f59e0b", ""),
+    "INFO":     ("info",     "#00e5ff", ""),
+    "TACTIC":   ("info",     "#00e5ff", ""),
 }
 
 def _classify_severity(text: str, alert_type: str = "") -> str:
@@ -461,9 +461,9 @@ function saveEntity(){{
       team:document.getElementById("m_team").value,
       role:document.getElementById("m_role").value.trim(),locked:true}})
   }}).then(r=>r.json()).then(d=>{{
-    document.getElementById("mstatus").textContent=d.ok?"✓ Saved":"✗ "+d.error;
+    document.getElementById("mstatus").textContent=d.ok?"Saved":""+d.error;
     if(d.ok)setTimeout(closeModal,700);
-  }}).catch(()=>document.getElementById("mstatus").textContent="✗ API unreachable");
+  }}).catch(()=>document.getElementById("mstatus").textContent="API unreachable");
 }}
 function clearEntity(){{
   if(selectedTrackId===null)return;
@@ -576,16 +576,16 @@ async function submitCalib(){{
   try{{
     const r=await fetch(API+"/court/calibrate",{{method:"POST",headers:{{"Content-Type":"application/json"}},body:JSON.stringify({{corners}})}});
     const d=await r.json();
-    showStatus(d.ok?"✓ Court calibrated — overlay active on next frame.":"✗ "+(d.error||"Calibration failed"),d.ok?"ok":"err");
-  }}catch(e){{showStatus("✗ API unreachable","err");}}
+    showStatus(d.ok?"Court calibrated — overlay active on next frame.":""+(d.error||"Calibration failed"),d.ok?"ok":"err");
+  }}catch(e){{showStatus("API unreachable","err");}}
 }}
 async function clearCalib(){{
   try{{
     const r=await fetch(API+"/court/calibrate",{{method:"POST",headers:{{"Content-Type":"application/json"}},body:JSON.stringify({{clear:true}})}});
     const d=await r.json();
-    showStatus(d.ok?"Calibration cleared.":"✗ "+d.error,d.ok?"ok":"err");
+    showStatus(d.ok?"Calibration cleared.":""+d.error,d.ok?"ok":"err");
     resetCorners();
-  }}catch(e){{showStatus("✗ API unreachable","err");}}
+  }}catch(e){{showStatus("API unreachable","err");}}
 }}
 function showStatus(msg,cls){{
   const el=document.getElementById("status");el.textContent=msg;el.className=cls;el.style.display="block";
@@ -598,17 +598,17 @@ SCOUTING_HTML = f"""<!DOCTYPE html><html><head>
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap');
   * {{ box-sizing: border-box; font-family: 'Rajdhani', sans-serif; user-select: none; }}
   body {{ background: transparent; color: #fff; margin: 0; padding: 10px; display: flex; gap: 20px; }}
-  
+
   /* Player List Column */
   .player-col {{ flex: 1; display: flex; flex-direction: column; gap: 5px; max-height: 600px; overflow-y: auto; }}
-  .player-btn {{ 
-    background: #161b22; border: 1px solid #30363d; color: #c9d1d9; 
+  .player-btn {{
+    background: #161b22; border: 1px solid #30363d; color: #c9d1d9;
     padding: 10px; text-align: left; cursor: pointer; border-radius: 4px;
     font-size: 14px; font-weight: 700; transition: 0.1s;
   }}
   .player-btn.active-a {{ background: #1f4287; border-color: #3b82f6; color: #fff; }}
   .player-btn.active-b {{ background: #7a1f1f; border-color: #ef4444; color: #fff; }}
-  
+
   /* Action Buttons Grid (Mimicking Data Video 2007 Layout) */
   .action-grid {{ flex: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; align-content: start; }}
   .action-btn {{
@@ -642,7 +642,7 @@ SCOUTING_HTML = f"""<!DOCTYPE html><html><head>
   <div class="action-btn btn-miss" onclick="logEvent('shot_rejected')">Shot Rejected</div>
   <div class="action-btn btn-miss" onclick="logEvent('shot_out')">Shot Out</div>
   <div class="action-btn btn-tactic" onclick="logEvent('assist')">Assist</div>
-  
+
   <!-- Goal Row -->
   <div class="action-btn btn-goal" onclick="logEvent('goal')">Goal</div>
   <div class="action-btn btn-saved" onclick="logEvent('shot_saved')">Shot Saved</div>
@@ -679,7 +679,7 @@ SCOUTING_HTML = f"""<!DOCTYPE html><html><head>
       const players = data.players || [];
       const list = document.getElementById("playerList");
       list.innerHTML = "";
-      
+
       players.sort((a,b) => a.team.localeCompare(b.team) || a.shirt_number - b.shirt_number).forEach(p => {{
         let btn = document.createElement("div");
         btn.className = "player-btn";
@@ -701,13 +701,13 @@ SCOUTING_HTML = f"""<!DOCTYPE html><html><head>
   async function logEvent(eventType) {{
     if (!selectedPlayerId) {{
       document.getElementById("status").style.color = "#ef4444";
-      document.getElementById("status").innerText = "⚠ Please select a player first!";
+      document.getElementById("status").innerText = "Please select a player first!";
       return;
     }}
-    
+
     document.getElementById("status").style.color = "#f59e0b";
     document.getElementById("status").innerText = "Logging...";
-    
+
     try {{
       const res = await fetch(API + "/match/manual-event", {{
         method: "POST",
@@ -721,7 +721,7 @@ SCOUTING_HTML = f"""<!DOCTYPE html><html><head>
       }});
       if(res.ok) {{
         document.getElementById("status").style.color = "#00ff88";
-        document.getElementById("status").innerText = `✓ ${{eventType.toUpperCase()}} logged successfully.`;
+        document.getElementById("status").innerText = `${{eventType.toUpperCase()}} logged successfully.`;
       }}
     }} catch(e) {{
       document.getElementById("status").style.color = "#ef4444";
@@ -803,7 +803,7 @@ def draw_sticky_header(state: dict, ms: dict,
     period  = ms.get("period") or 1
     elapsed = ms.get("period_elapsed_s") or 0
     poss    = (ms.get("possession") or {}).get("team", "")
-    poss_txt = f"⬤ {na}" if poss == "team_a" else (f"⬤ {nb}" if poss == "team_b" else "")
+    poss_txt = f"{na}" if poss == "team_a" else (f"{nb}" if poss == "team_b" else "")
 
     logo_a_html = (
         f'<img src="{logo_a}" class="kpi-logo" alt="{na}">'
@@ -849,15 +849,15 @@ def draw_stat_bar(label: str, val_a: float, val_b: float,
 
 
 EVENT_ICONS = {
-    "goal":              ("⚽", "#f59e0b"),
-    "shot":              ("🎯", "#60a5fa"),
-    "save":              ("🧤", "#34d399"),
-    "fast_break":        ("⚡", "#a78bfa"),
-    "possession_change": ("🔄", "#8b949e"),
-    "passive_warning":   ("⚠️",  "#f97316"),
-    "passive_violation": ("🚫", "#ef4444"),
-    "period_end":        ("🔔", "#fbbf24"),
-    "overload":          ("👥", "#ef4444"),
+    "goal":              ("", "#f59e0b"),
+    "shot":              ("", "#60a5fa"),
+    "save":              ("", "#34d399"),
+    "fast_break":        ("", "#a78bfa"),
+    "possession_change": ("", "#8b949e"),
+    "passive_warning":   ("",  "#f97316"),
+    "passive_violation": ("", "#ef4444"),
+    "period_end":        ("", "#fbbf24"),
+    "overload":          ("", "#ef4444"),
 }
 
 
@@ -1012,12 +1012,12 @@ def _fetch_llm_insights() -> list:
 # ── Side panels ───────────────────────────────────────────────────────────────
 
 def panel_controls(state: dict):
-    with st.expander("⚡ Match Controls", expanded=True):
+    with st.expander("Match Controls", expanded=True):
         c1, c2 = st.columns(2)
         if c1.button("↔ Flip Sides", width="stretch"):
             api_post("/flip-sides", {})
             st.success("Flipped")
-        if c2.button("🎨 Re-calibrate Colors", width="stretch"):
+        if c2.button("Re-calibrate Colors", width="stretch"):
             api_post("/recalibrate", {})
             st.success("Recalibrating…")
 
@@ -1027,10 +1027,10 @@ def panel_controls(state: dict):
         na = teams.get("team_a", {}).get("name", "Home")
         nb = teams.get("team_b", {}).get("name", "Away")
         g1, g2 = st.columns(2)
-        if g1.button(f"⚽ {na}", width="stretch"):
+        if g1.button(f"{na}", width="stretch"):
             api_post("/goal", {"team": "team_a"})
             st.rerun()
-        if g2.button(f"⚽ {nb}", width="stretch"):
+        if g2.button(f"{nb}", width="stretch"):
             api_post("/goal", {"team": "team_b"})
             st.rerun()
 
@@ -1048,7 +1048,7 @@ def panel_controls(state: dict):
 
 
 def panel_teams(state: dict):
-    with st.expander("👕 Teams & Colors", expanded=False):
+    with st.expander("Teams & Colors", expanded=False):
         teams = state.get("teams", {})
         for key in ("team_a", "team_b"):
             t     = teams.get(key, {})
@@ -1068,7 +1068,7 @@ def panel_teams(state: dict):
 
 
 def panel_roster(state: dict):
-    with st.expander("👥 Player Roster", expanded=False):
+    with st.expander("Player Roster", expanded=False):
         entities   = state.get("entities", {})
         team_names = {k: v.get("name", k) for k, v in state.get("teams", {}).items()}
         if not entities:
@@ -1082,13 +1082,13 @@ def panel_roster(state: dict):
             c1, c2, c3 = st.columns([4, 2, 1])
             c1.markdown(f"**#{e.get('shirt_number',0)} {name}**")
             c2.caption(team_names.get(team, team))
-            if c3.button("✕", key=f"del_{tid}"):
+            if c3.button("", key=f"del_{tid}"):
                 api_delete(f"/entity/{tid}")
                 st.rerun()
 
 
 def panel_players():
-    with st.expander("🧠 Player Recognition DB", expanded=True):
+    with st.expander("Player Recognition DB", expanded=True):
         data = api_get("/players")
         if not data.get("ok"):
             st.caption("Database not ready yet.")
@@ -1143,9 +1143,9 @@ def panel_players():
                                 unsafe_allow_html=True,
                             )
                         else:
-                            st.write("👤")
+                            st.write("")
                     else:
-                        st.write("👤")
+                        st.write("")
                 with c_info:
                     color = "#f0c040" if is_auto else "#3fb950"
                     tag   = "auto" if is_auto else "named"
@@ -1154,7 +1154,7 @@ def panel_players():
                         f"<small style='color:#8b949e'>[{tag}] {p.get('role','')}</small>",
                         unsafe_allow_html=True,
                     )
-                    status = "✅ Recognising" if rdy else f"📷 Learning ({samples}/5)"
+                    status = "Recognising" if rdy else f"Learning ({samples}/5)"
                     st.markdown(
                         f"<small style='font-family:monospace;color:#3fb950'>{bar}</small> "
                         f"<small style='color:#8b949e'>{status}</small>",
@@ -1163,18 +1163,18 @@ def panel_players():
                 with c_ren:
                     new_name = st.text_input("Rename", key=f"ren_{pid}",
                                              placeholder="Real name", label_visibility="collapsed")
-                    if st.button("✓", key=f"ok_{pid}") and new_name.strip():
+                    if st.button("", key=f"ok_{pid}") and new_name.strip():
                         api_post(f"/players/{pid}/rename",
                                  {"name": new_name.strip(), "shirt_number": p.get("shirt_number", 0)})
                         st.rerun()
                 with c_del:
-                    if st.button("✕", key=f"dpl_{pid}"):
+                    if st.button("", key=f"dpl_{pid}"):
                         api_delete(f"/players/{pid}")
                         st.rerun()
 
 
 def panel_occlusion():
-    with st.expander("👁 Player Tracking Status", expanded=False):
+    with st.expander("Player Tracking Status", expanded=False):
         data = api_get("/bridge/status")
         if not data.get("ok"):
             st.caption("Bridge not ready.")
@@ -1199,7 +1199,7 @@ def panel_occlusion():
 
 
 def panel_court():
-    with st.expander("🏟 Court Detection", expanded=False):
+    with st.expander("Court Detection", expanded=False):
         court = api_get("/court/status")
         if not court:
             st.caption("Pipeline not connected.")
@@ -1217,7 +1217,7 @@ def panel_court():
 
 
 def panel_camera():
-    with st.expander("🎥 Camera Settings", expanded=False):
+    with st.expander("Camera Settings", expanded=False):
         cam = api_get("/camera")
         with st.form("camera_form"):
             c1, c2 = st.columns(2)
@@ -1239,15 +1239,15 @@ def panel_camera():
 # ── Technique Feed ───────────────────────────────────────────────────────────
 
 _TECHNIQUE_ICONS: dict[str, str] = {
-    "jump_shot":      "🏃",
-    "standing_shot":  "🎯",
-    "fast_break":     "⚡",
-    "pass":           "↗️",
-    "overhead_pass":  "🙌",
-    "dribble_run":    "🔄",
-    "gk_save":        "🧤",
-    "block":          "🛡️",
-    "pivot_receive":  "🔁",
+    "jump_shot":      "",
+    "standing_shot":  "",
+    "fast_break":     "",
+    "pass":           "↗",
+    "overhead_pass":  "",
+    "dribble_run":    "",
+    "gk_save":        "",
+    "block":          "",
+    "pivot_receive":  "",
 }
 
 _TECHNIQUE_LABELS: dict[str, str] = {
@@ -1277,7 +1277,7 @@ def _draw_technique_feed(n: int = 8, window_s: int = 30) -> None:
 
     for ev in events:
         technique = ev.get("technique", "unknown")
-        icon      = _TECHNIQUE_ICONS.get(technique, "🤾")
+        icon      = _TECHNIQUE_ICONS.get(technique, "")
         label     = _TECHNIQUE_LABELS.get(technique, technique.replace("_", " ").title())
         team      = ev.get("team", "?")
         zone      = ev.get("zone", "—")
@@ -1341,7 +1341,7 @@ def tab_live(state: dict, logo_a: str | None = None, logo_b: str | None = None):
         st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown(
             "<span class='glass-card-label' style='display:block;margin-bottom:8px'>"
-            "🤾 Detected Techniques</span>",
+            "Detected Techniques</span>",
             unsafe_allow_html=True,
         )
         _draw_technique_feed()
@@ -1349,7 +1349,7 @@ def tab_live(state: dict, logo_a: str | None = None, logo_b: str | None = None):
         st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown(
             "<span class='glass-card-label' style='display:block;margin-bottom:10px'>"
-            "⚡ Coach AI Alerts</span>",
+            "Coach AI Alerts</span>",
             unsafe_allow_html=True,
         )
         insights = _fetch_llm_insights()
@@ -1362,9 +1362,9 @@ def tab_live(state: dict, logo_a: str | None = None, logo_b: str | None = None):
 # ── Tab: TAGGING ─────────────────────────────────────────────────────────────
 
 def tab_tagging():
-    st.markdown("## 📊 Manual Scouting & Tagging")
+    st.markdown("## Manual Scouting & Tagging")
     st.caption("Professional layout for manual event logging. Select a player on the left, then click an action. Events sync instantly with the Match Analyzer and Timeline.")
-    
+
     st.markdown("<div class='glass-card' style='padding:0'>", unsafe_allow_html=True)
     components.html(SCOUTING_HTML, height=600, scrolling=False)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -1637,7 +1637,7 @@ def tab_players():
 # ── Tab: COACH AI ────────────────────────────────────────────────────────────
 
 def tab_coach():
-    st.markdown("## 🧠 Coach AI Assistant")
+    st.markdown("## Coach AI Assistant")
 
     col_alerts, col_chat, col_ref = st.columns([3, 4, 3])
 
@@ -1690,15 +1690,15 @@ def tab_coach():
     # ── Column 3: God Mode (Rules Editor) ──────────────────────────────────
     with col_ref:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<span class='glass-card-label'>🧠 God Mode (Rules)</span>",
+        st.markdown("<span class='glass-card-label'>God Mode (Rules)</span>",
                     unsafe_allow_html=True)
         rules_data = api_get("/coach/rules_text")
         current_rules = rules_data.get("rules", "You are a handball tactical analyst...")
-        
+
         with st.form("rules_form"):
-            new_rules = st.text_area("Edit Tactical Focus & Rules", value=current_rules, height=350, 
+            new_rules = st.text_area("Edit Tactical Focus & Rules", value=current_rules, height=350,
                                      help="Ollama will read this file every time it generates a report.")
-            if st.form_submit_button("💾 Save Rules & Force Analysis", type="primary"):
+            if st.form_submit_button("Save Rules & Force Analysis", type="primary"):
                 api_post("/coach/rules_text", {"rules": new_rules})
                 api_post("/analyst/request", {})
                 st.success("Rules saved! Analyst is working...")
@@ -1726,8 +1726,8 @@ def tab_camera_imaging():
     is_night = mode == "night"
 
     mode_colors = {"day": "#10b981", "auto": "#3b82f6", "night": "#ef4444", "unknown": "#8b949e"}
-    mode_icons  = {"day": "☀️ DAY (White Light)", "auto": "🔄 AUTO",
-                   "night": "🌙 NIGHT (IR Active)", "unknown": "❓ Unknown"}
+    mode_icons  = {"day": "DAY (White Light)", "auto": "AUTO",
+                   "night": "NIGHT (IR Active)", "unknown": "Unknown"}
     badge_color = mode_colors.get(mode, "#8b949e")
     badge_label = mode_icons.get(mode, mode.upper())
 
@@ -1736,7 +1736,7 @@ def tab_camera_imaging():
             f"<div style='background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.45);"
             f"border-radius:10px;padding:12px 18px;margin-bottom:14px;"
             f"box-shadow:0 0 16px rgba(239,68,68,0.15);'>"
-            f"<span style='color:#ef4444;font-weight:800;font-size:1rem;'>🌙 Night Mode Active</span>"
+            f"<span style='color:#ef4444;font-weight:800;font-size:1rem;'>Night Mode Active</span>"
             f"<span style='color:#c9d1d9;font-size:0.85rem;margin-left:12px;'>"
             f"Camera is in IR mode — images are greyscale, jersey colours cannot be detected.</span>"
             f"</div>",
@@ -1754,7 +1754,7 @@ def tab_camera_imaging():
             unsafe_allow_html=True,
         )
     with dn_col2:
-        if st.button("☀️ White Light", width="stretch",
+        if st.button("White Light", width="stretch",
                      disabled=not cam_ok, key="dn_day",
                      type="primary" if is_night else "secondary"):
             r = api_post("/camera/daynight", {"mode": "day"})
@@ -1766,7 +1766,7 @@ def tab_camera_imaging():
             else:
                 st.error(r.get("error", "Failed to switch mode"))
     with dn_col3:
-        if st.button("🔄 Auto", width="stretch",
+        if st.button("Auto", width="stretch",
                      disabled=not cam_ok, key="dn_auto"):
             r = api_post("/camera/daynight", {"mode": "auto"})
             if r.get("ok"):
@@ -1775,7 +1775,7 @@ def tab_camera_imaging():
             else:
                 st.error(r.get("error", "Failed"))
     with dn_col4:
-        if st.button("🌙 Night IR", width="stretch",
+        if st.button("Night IR", width="stretch",
                      disabled=not cam_ok, key="dn_night"):
             r = api_post("/camera/daynight", {"mode": "night"})
             if r.get("ok"):
@@ -1825,7 +1825,7 @@ def tab_camera_imaging():
         ("BALL",    "ball",    "primary" if az_mode == "ball"    else "secondary"),
         ("GOAL A",  "goal_a",  "primary" if az_mode == "goal_a"  else "secondary"),
         ("GOAL B",  "goal_b",  "primary" if az_mode == "goal_b"  else "secondary"),
-        ("🔍 SCAN", "scan",    "primary" if az_mode == "scan"    else "secondary"),
+        ("SCAN", "scan",    "primary" if az_mode == "scan"    else "secondary"),
     ]
     for col, (lbl, md, btn_type) in zip(az_cols, az_buttons):
         with col:
@@ -1859,7 +1859,7 @@ def tab_camera_imaging():
             elif players > 0:
                 css_cls = "zone-found";  dot = "●"; dot_color = "#00e5ff"
             else:
-                css_cls = "zone-empty";  dot = "✕"; dot_color = "#ff3e3e"
+                css_cls = "zone-empty";  dot = ""; dot_color = "#ff3e3e"
             player_txt = f"{players}P" if players >= 0 else "—"
             zone_cards.append(
                 f"<div class='zone-card {css_cls}'>"
@@ -1888,11 +1888,11 @@ def tab_camera_imaging():
 
     zr1, zr2, zr3 = st.columns(3)
     with zr1:
-        if st.button("🔍+ ZOOM IN", width="stretch", key="dz_in"):
+        if st.button("+ ZOOM IN", width="stretch", key="dz_in"):
             api_post("/camera/zoom", {"direction": "in", "step": 0.25})
             st.rerun()
     with zr2:
-        if st.button("🔍− ZOOM OUT", width="stretch",
+        if st.button("− ZOOM OUT", width="stretch",
                      disabled=cur_zoom <= 1.001, key="dz_out"):
             api_post("/camera/zoom", {"direction": "out", "step": 0.25})
             st.rerun()
@@ -1974,7 +1974,7 @@ def tab_camera_imaging():
     )
     fc1, fc2, fc3, fc4 = st.columns(4)
     with fc1:
-        if st.button("⚡ AUTO FOCUS", width="stretch",
+        if st.button("AUTO FOCUS", width="stretch",
                      disabled=not cam_ok, key="focus_auto"):
             r = api_post("/camera/focus/auto", {}) or {}
             if r.get("ok"):
@@ -2033,7 +2033,7 @@ def tab_camera_imaging():
             "then sends the current match state to the AI Coach for deep tactical analysis."
         )
     with ana_col2:
-        if st.button("🔍 Analyze Now", width="stretch",
+        if st.button("Analyze Now", width="stretch",
                      disabled=not cam_ok, key="btn_analyze"):
             with st.spinner("AI analyzing stadium view…"):
                 r = api_post("/camera/analyze", {})
@@ -2168,10 +2168,10 @@ def tab_court_setup():
 
 | # | Corner | Colour |
 |---|--------|--------|
-| 1 | Top-Left | 🟢 Green |
-| 2 | Top-Right | 🔵 Cyan |
-| 3 | Bottom-Right | 🟠 Orange |
-| 4 | Bottom-Left | 🔴 Red |
+| 1 | Top-Left | Green |
+| 2 | Top-Right | Cyan |
+| 3 | Bottom-Right | Orange |
+| 4 | Bottom-Left | Red |
 
 Corners should be the **outer boundary** of the playing court.
 
@@ -2207,7 +2207,7 @@ def render_sidebar(state: dict) -> tuple[str | None, str | None]:
     with st.sidebar:
         st.markdown(
             "<div style='font-size:1.1rem;font-weight:900;color:#00e5ff;"
-            "letter-spacing:1px;margin-bottom:4px'>🤾 Handball AI Pro</div>",
+            "letter-spacing:1px;margin-bottom:4px'>Handball AI Pro</div>",
             unsafe_allow_html=True,
         )
         st.markdown(
@@ -2255,7 +2255,7 @@ def render_sidebar(state: dict) -> tuple[str | None, str | None]:
         if c1.button("↔ Flip Sides", width="stretch", key="sb_flip"):
             api_post("/flip-sides", {})
             st.rerun()
-        if c2.button("🎨 Re-Color", width="stretch", key="sb_recal"):
+        if c2.button("Re-Color", width="stretch", key="sb_recal"):
             api_post("/recalibrate", {})
             st.success("Recalibrating…")
 
@@ -2287,13 +2287,13 @@ def render_sidebar(state: dict) -> tuple[str | None, str | None]:
         st.markdown("<div class='sidebar-section-title' style='color:#ef4444;"
                     "border-color:rgba(239,68,68,0.3)'>Testing</div>",
                     unsafe_allow_html=True)
-        with st.expander("⚠ Clear Database", expanded=False):
+        with st.expander("Clear Database", expanded=False):
             st.caption("Wipes players, analytics, profiles, match state, score, "
                        "and detection log. Camera config and court calibration "
                        "are preserved. The pipeline keeps running.")
             confirm = st.checkbox("Yes, I really want to clear all data",
                                   key="sb_clear_confirm")
-            if st.button("🗑 CLEAR ALL", width="stretch",
+            if st.button("CLEAR ALL", width="stretch",
                          disabled=not confirm,
                          key="sb_clear_all",
                          type="primary"):
@@ -2342,8 +2342,8 @@ def main():
 
     (live_tab, tagging_tab, summary_tab, players_tab,
      coach_tab, camera_tab, court_tab) = st.tabs([
-        "🔴  LIVE", "🎯  SCOUTING", "📊  MATCH SUMMARY", "👤  PLAYER PROFILES",
-        "🧠  COACH AI", "📷  CAMERA IMAGING", "🏟  COURT SETUP",
+        " LIVE", " SCOUTING", " MATCH SUMMARY", " PLAYER PROFILES",
+        " COACH AI", " CAMERA IMAGING", " COURT SETUP",
     ])
 
     with live_tab:

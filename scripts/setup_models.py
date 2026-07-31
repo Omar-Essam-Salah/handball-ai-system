@@ -95,7 +95,7 @@ def download_via_boxmot(name: str) -> bool:
             device=torch.device("cpu"),
             half=False,
         )
-        print(f"  ✓ {name} downloaded by boxmot")
+        print(f"  {name} downloaded by boxmot")
         return True
     except Exception as e:
         print(f"  ! boxmot download failed: {e}")
@@ -108,7 +108,7 @@ def download_yolo(name: str, url: str) -> bool:
         from ultralytics import YOLO
         print(f"  Downloading {name} via ultralytics...")
         model = YOLO(name)   # triggers auto-download if not present
-        print(f"  ✓ {name} ready at {Path(name).resolve()}")
+        print(f"  {name} ready at {Path(name).resolve()}")
         return True
     except Exception as e:
         print(f"  ! ultralytics download failed: {e}")
@@ -142,7 +142,7 @@ def main():
 
     for name, info in MODELS.items():
         present = check_model(name)
-        status  = "✓ present" if present else "✗ missing"
+        status  = "present" if present else "missing"
         req_tag = "[REQUIRED]" if info["required"] else "[optional]"
         print(f"\n  {req_tag} {name}  ({info['size']})")
         print(f"  {info['desc']}")
@@ -153,10 +153,10 @@ def main():
 
     if args.check:
         if missing_required:
-            print(f"\n⚠ Missing required models: {missing_required}")
+            print(f"\nMissing required models: {missing_required}")
             sys.exit(1)
         else:
-            print("\n✓ All required models present.")
+            print("\nAll required models present.")
             sys.exit(0)
 
     print("\n" + "=" * 60)
@@ -169,7 +169,7 @@ def main():
         if not should_download:
             continue
         if check_model(name):
-            print(f"\n  ✓ {name} already present — skipping")
+            print(f"\n  {name} already present — skipping")
             continue
 
         print(f"\n  Downloading: {name} ({info['size']})...")
@@ -181,16 +181,16 @@ def main():
             ok = download_yolo(name, info["url"])
 
         if not ok:
-            print(f"  ✗ Failed to download {name}")
+            print(f"  Failed to download {name}")
             failed.append(name)
 
     print("\n" + "=" * 60)
     if failed:
-        print(f"  ✗ Failed: {failed}")
+        print(f"  Failed: {failed}")
         print("  Try running: pip install boxmot ultralytics --upgrade")
         sys.exit(1)
     else:
-        print("  ✓ All models downloaded. System is ready for offline use.")
+        print("  All models downloaded. System is ready for offline use.")
         print("  Run: python src/pipeline.py")
 
 
